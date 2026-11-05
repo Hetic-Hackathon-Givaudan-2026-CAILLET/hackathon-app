@@ -1,0 +1,17 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main, develop]
+
+jobs:
+  qualite:
+    runs-on: ubuntu-latest
+    container: node:24-trixie
+    steps:
+      - uses: actions/checkout@v7
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run format:check
+      - run: npm run build
