@@ -24,7 +24,7 @@ services:
       POSTGRES_PASSWORD: app
       POSTGRES_DB: app
     ports:
-      - '127.0.0.1:5432:5432'
+      - '127.0.0.1:5433:5432'
     volumes:
       # Les données, dans un dossier du projet (ignoré par git)
       - ./db/data:/var/lib/postgresql/data
