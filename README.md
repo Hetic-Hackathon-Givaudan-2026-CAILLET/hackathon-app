@@ -1,4 +1,4 @@
-# Hackathon app
+# Hackathon appp
 
 Application de démonstration composée d'un front web, d'une API Node.js,
 d'une base PostgreSQL et d'un modèle de langage local via Ollama.
