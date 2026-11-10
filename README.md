@@ -17,7 +17,7 @@ Installez les outils suivants :
 - **Git**
 - **Docker Desktop** sur Windows/macOS, ou **Docker Engine et Docker Compose
   v2** sur Linux
-- **Ollama** avec le modèle `llama3.2:1b`
+- **Ollama** (le modèle `llama3.2:1b` se télécharge à l'étape 3)
 - **Visual Studio Code**
 - L'extension VS Code **Dev Containers**
 
@@ -80,15 +80,22 @@ le dossier et recommencez.
 
 ### Démarrer Ollama
 
-Dans un terminal sur la machine hôte (pas dans le conteneur), lancez le modèle.
-Cette commande démarre Ollama et télécharge le modèle s'il n'est pas encore
-installé :
+Dans un terminal sur la machine hôte (pas dans le conteneur), téléchargez le
+modèle (sans ouvrir de session de chat) :
 
 ```sh
-ollama run llama3.2:1b
+ollama pull llama3.2:1b
 ```
 
-Laissez Ollama tourner pendant l'utilisation de l'application. Dans le terminal
+Vérifiez ensuite que le service Ollama répond (sur macOS et Windows,
+l'application Ollama le lance automatiquement) :
+
+```sh
+curl http://localhost:11434/api/tags
+```
+
+Si la commande échoue, lancez `ollama serve` dans un terminal dédié et laissez-le
+ouvert pendant l'utilisation de l'application. Dans le terminal
 intégré de VS Code, vérifiez que le fichier de configuration existe :
 
 ```sh
@@ -153,7 +160,8 @@ docker compose exec -w /workspace dev npm ci
 docker compose exec -w /workspace dev sh -c 'test -f api/.env || cp api/.env.example api/.env'
 ```
 
-Ollama doit être installé et lancé sur la machine hôte avec `llama3.2:1b`.
+Ollama doit être installé et lancé sur la machine hôte, avec le modèle
+`llama3.2:1b` téléchargé (`ollama pull llama3.2:1b`).
 Le répertoire du projet est partagé avec le conteneur, donc `api/.env` est
 visible des deux côtés.
 
@@ -332,37 +340,57 @@ depuis votre machine.
 
 ## 9. Choix techniques, budget et périmètre
 
-- **Node.js 24 et TypeScript** : environnement partagé entre l'API et les
-  outils du front; le typage et la compilation détectent certaines erreurs
-  avant l'exécution.
-- **Express** : API HTTP légère, séparée du front.
-- **Vite** : serveur de développement et build du client web; les requêtes
-  `/api` sont transmises à l'API locale.
-- **PostgreSQL 17** : stockage relationnel des questions/réponses avec
-  initialisation reproductible par Compose.
-- **Ollama (`llama3.2:1b`)** : modèle local configuré par variables
-  d'environnement et exécuté sur la machine hôte. Les questions ne sont pas
-  envoyées à un fournisseur externe et n'entraînent pas de frais d'API.
+Les décisions sont justifiées dans des ADR (_Architecture Decision Records_),
+dans [docs/adr/](docs/adr/) :
 
-**Budget :** aucun coût d'API n'est prévu avec Ollama local; son exécution
-utilise les ressources de la machine hôte.
+- [0001 : PostgreSQL 17](docs/adr/0001-postgresql.md)
+- [0002 : fournisseur d'IA (API compatible OpenAI, Ollama local)](docs/adr/0002-fournisseur-ia.md)
+- [0003 : stack applicative (Node.js, TypeScript, Express, Vite)](docs/adr/0003-stack-applicative.md)
+- [0004 : budget et périmètre exclu](docs/adr/0004-budget-et-perimetre.md)
 
-**Hors périmètre actuel :** authentification des utilisateurs, limitation de
-débit, RAG, déploiement de production et automatisation de tests fonctionnels.
+En résumé : Node.js 24 et TypeScript pour l'API et le front, Express, Vite,
+PostgreSQL 17 via Compose, et Ollama (`llama3.2:1b`) en local, sans frais d'API.
+Sont exclus : authentification, limitation de débit, RAG, déploiement de
+production et tests fonctionnels automatisés.
+
 Le service Python FastAPI/Ollama dans `ai/` est une expérimentation distincte :
 il n'est pas lancé par Compose et n'est pas appelé par l'application web/API
 principale, qui appelle directement l'API locale d'Ollama.
 
-## 10. GitHub et exécution multi-machine
+## 10. GitHub : équipes, rôles et protection des branches
 
-Les équipes, leurs permissions, la protection de `main`/`develop` et les
-checks requis de fusion se configurent dans les paramètres GitHub de
-l'organisation et du dépôt. Un administrateur doit vérifier que les deux
-branches exigent une pull request, que le check `qualite` est requis et que
-les permissions de chaque équipe correspondent à ses responsabilités.
+### Équipes et rôles
+
+| Équipe         | Rôle GitHub | Justification                                                                                                                          |
+| -------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `tech-leads`   | Maintain    | Propriétaires de l'infrastructure (voir `.github/CODEOWNERS`); gèrent les réglages du dépôt sans être propriétaires de l'organisation. |
+| `developpeurs` | Write       | Créent des branches et des pull requests, mais ne peuvent pas pousser sur `main`/`develop`.                                            |
+| `data-ia`      | Write       | Travaillent sur la partie IA; même niveau que les développeurs, sans droits d'administration.                                          |
+
+Principe : droits minimaux nécessaires. Seuls les membres de `tech-leads`
+approuvent les changements touchant `.devcontainer/`, `.github/`, `compose.yaml`,
+`eslint.config.mjs` et `package.json` (revue obligatoire via `CODEOWNERS`).
+
+### Protection de `main` et `develop`
+
+Réglages à appliquer dans **Settings > Branches** (règle pour chaque branche) :
+
+- Pull request obligatoire avant fusion; push direct refusé, y compris pour les
+  administrateurs.
+- Au moins une approbation; revue des propriétaires de code requise.
+- Check de statut requis : **CI / qualite**, branche à jour avant fusion.
+
+Démonstration : `git push origin develop` depuis un commit local doit être
+refusé (`protected branch hook declined`).
+
+### Exécution multi-machine
 
 Pour le test multi-machine, répétez les étapes 1 à 5 sur deux machines ou
-architectures distinctes. Sur chacune, vérifiez les versions de Docker avec
-`docker version`, la santé de PostgreSQL et de l'API, l'ouverture du front et
-une soumission IA. Le dépôt ne contient pas de test automatisé
-multi-architecture.
+architectures distinctes, puis consignez le résultat dans le tableau suivant :
+
+| Machine / OS | Architecture | `docker version` | API + PostgreSQL | Front | Appel IA |
+| ------------ | ------------ | ---------------- | ---------------- | ----- | -------- |
+|              |              |                  |                  |       |          |
+|              |              |                  |                  |       |          |
+
+Le dépôt ne contient pas de test automatisé multi-architecture.
