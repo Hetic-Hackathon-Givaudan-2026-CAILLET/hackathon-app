@@ -361,11 +361,12 @@ principale, qui appelle directement l'API locale d'Ollama.
 
 ### Équipes et rôles
 
-| Équipe         | Rôle GitHub | Justification                                                                                                                          |
-| -------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `tech-leads`   | Maintain    | Propriétaires de l'infrastructure (voir `.github/CODEOWNERS`); gèrent les réglages du dépôt sans être propriétaires de l'organisation. |
-| `developpeurs` | Write       | Créent des branches et des pull requests, mais ne peuvent pas pousser sur `main`/`develop`.                                            |
-| `data-ia`      | Write       | Travaillent sur la partie IA; même niveau que les développeurs, sans droits d'administration.                                          |
+| Équipe       | Rôle GitHub | Justification                                                                                                                           |
+| ------------ | ----------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `tech-leads` | Maintain    | Propriétaires de l'infrastructure (voir `.github/CODEOWNERS`); gèrent les réglages du dépôt sans être propriétaires de l'organisation.  |
+| `product`    | Write       | Développent les fonctionnalités du produit; créent des branches et des pull requests, mais ne peuvent pas pousser sur `main`/`develop`. |
+| `data-ia`    | Write       | Travaillent sur la partie IA; même niveau que `product`, sans droits d'administration.                                                  |
+| `evaluation` | Read        | Consultent le code, les pull requests et la CI pour évaluer le projet; aucun droit de modification.                                     |
 
 Principe : droits minimaux nécessaires. Seuls les membres de `tech-leads`
 approuvent les changements touchant `.devcontainer/`, `.github/`, `compose.yaml`,
