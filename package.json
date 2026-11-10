@@ -7,7 +7,7 @@
     "web"
   ],
   "scripts": {
-    "dev": "concurrently -n api,web \"npm run dev -w api\" \"npm run dev -w web\"",
+    "dev": "concurrently -n api,web \"npm run dev -w api\" \"wait-on -t 60000 tcp:127.0.0.1:3000 && npm run dev -w web\"",
     "build": "npm run build --workspaces",
     "lint": "eslint .",
     "format": "prettier --write . '!db/data'",
@@ -22,7 +22,8 @@
     "husky": "^9.1.7",
     "lint-staged": "^17.6.0",
     "prettier": "^3.9.10",
-    "typescript-eslint": "^8.72.1"
+    "typescript-eslint": "^8.72.1",
+    "wait-on": "^9.5.1"
   },
   "lint-staged": {
     "*.{ts,js,mjs}": [
