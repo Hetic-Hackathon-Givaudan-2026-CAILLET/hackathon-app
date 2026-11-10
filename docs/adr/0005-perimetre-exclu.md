@@ -20,7 +20,7 @@ front, API, base de données et appel à l'IA, dans un environnement reproductib
 ## Décision
 
 Nous excluons du périmètre : l'authentification des utilisateurs, la limitation
-de débit, le RAG, le déploiement de production, les tests fonctionnels
+de débit, le déploiement de production, les tests fonctionnels
 automatisés et l'exécution du service Python `ai/` dans l'application
 principale.
 
