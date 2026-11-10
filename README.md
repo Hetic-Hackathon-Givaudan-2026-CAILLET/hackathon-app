@@ -376,8 +376,10 @@ dans [docs/adr/](docs/adr/) :
 
 - [0001 : PostgreSQL 17](docs/adr/0001-postgresql.md)
 - [0002 : fournisseur d'IA (API compatible OpenAI, Ollama local)](docs/adr/0002-fournisseur-ia.md)
-- [0003 : stack applicative (Node.js, TypeScript, Express, Vite)](docs/adr/0003-stack-applicative.md)
-- [0004 : budget et périmètre exclu](docs/adr/0004-budget-et-perimetre.md)
+- [0003 : Node.js et TypeScript](docs/adr/0003-stack-applicative.md)
+- [0004 : budget à zéro euro](docs/adr/0004-budget-zero.md)
+- [0005 : périmètre exclu](docs/adr/0005-perimetre-exclu.md)
+- [0006 : dev container avec Docker Compose](docs/adr/0006-environnement-dev-container.md)
 
 En résumé : Node.js 24 et TypeScript pour l'API et le front, Express, Vite,
 PostgreSQL 17 via Compose, et Ollama (`llama3.2:1b`) en local, sans frais d'API.
