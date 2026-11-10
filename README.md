@@ -42,6 +42,11 @@ l'application puisse le joindre.
 
 ## 2. Cloner le dépôt
 
+Sous Windows, le fichier `.gitattributes` du dépôt force les fins de ligne LF
+(nécessaire pour Prettier, le hook `pre-commit` et le dev container). Si votre
+Git a converti les fichiers en CRLF avant cette configuration, reclonez le dépôt
+après avoir lancé `git config --global core.autocrlf input`.
+
 Ouvrez un terminal sur votre machine hôte, puis exécutez :
 
 ```sh
@@ -95,8 +100,22 @@ curl http://localhost:11434/api/tags
 ```
 
 Si la commande échoue, lancez `ollama serve` dans un terminal dédié et laissez-le
-ouvert pendant l'utilisation de l'application. Dans le terminal
-intégré de VS Code, vérifiez que le fichier de configuration existe :
+ouvert pendant l'utilisation de l'application.
+
+**Linux avec Docker Engine :** par défaut, Ollama n'écoute que sur `127.0.0.1`
+et le conteneur ne peut pas le joindre. Lancez-le à la place avec :
+
+```sh
+OLLAMA_HOST=0.0.0.0 ollama serve
+```
+
+(Si Ollama tourne comme service systemd, ajoutez
+`Environment="OLLAMA_HOST=0.0.0.0"` avec `sudo systemctl edit ollama`, puis
+`sudo systemctl restart ollama`.) Sur Windows et macOS avec Docker Desktop, rien
+de plus n'est nécessaire.
+
+Dans le terminal intégré de VS Code, vérifiez que le fichier de configuration
+existe :
 
 ```sh
 test -f api/.env && echo "api/.env existe" || echo "api/.env est absent"
@@ -156,8 +175,8 @@ Installez les dépendances dans le conteneur de développement et créez le
 fichier de configuration s'il n'existe pas :
 
 ```sh
-docker compose exec -w /workspace dev npm ci
-docker compose exec -w /workspace dev sh -c 'test -f api/.env || cp api/.env.example api/.env'
+docker compose exec -u node -w /workspace dev npm ci
+docker compose exec -u node -w /workspace dev sh -c 'test -f api/.env || cp api/.env.example api/.env'
 ```
 
 Ollama doit être installé et lancé sur la machine hôte, avec le modèle
@@ -168,12 +187,22 @@ visible des deux côtés.
 Démarrez les serveurs au premier plan :
 
 ```sh
-docker compose exec -w /workspace dev npm run dev
+docker compose exec -u node -w /workspace dev npm run dev
 ```
 
-Laissez cette commande tourner, puis ouvrez <http://localhost:5173>. Pour
-arrêter les serveurs, faites `Ctrl+C`. Pour arrêter les conteneurs sans
-supprimer la base :
+Laissez cette commande tourner. **Attention :** dans cette méthode, aucun port
+du conteneur `dev` n'est publié sur votre machine (seul VS Code transfère les
+ports 3000 et 5173). `http://localhost:5173` n'est donc pas joignable depuis
+votre navigateur. Pour vérifier que tout fonctionne, lancez les commandes de la
+section 5 **dans le conteneur**, en préfixant chaque `curl` ainsi :
+
+```sh
+docker compose exec -u node dev curl -i http://localhost:3000/api/health
+```
+
+Pour utiliser le front dans le navigateur, préférez la méthode de la section 3
+(VS Code Dev Containers). Pour arrêter les serveurs, faites `Ctrl+C`. Pour
+arrêter les conteneurs sans supprimer la base :
 
 ```sh
 docker compose down
@@ -182,8 +211,10 @@ docker compose down
 ## 5. Vérifier front, API, IA et PostgreSQL
 
 Avec `npm run dev` toujours actif, exécutez les commandes suivantes depuis un
-autre terminal. Elles peuvent être lancées sur la machine hôte ou dans le
-terminal du conteneur; VS Code transfère le port `3000`.
+autre terminal. Avec la méthode de la section 3, elles peuvent être lancées sur
+la machine hôte ou dans le terminal du conteneur (VS Code transfère le port
+`3000`). Avec la méthode de la section 4, lancez-les dans le conteneur
+(`docker compose exec -u node dev curl ...`).
 
 ### Santé de l'API et de la base
 
