@@ -1,0 +1,1070 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "IA de l'équipe Data/IA",
+    "version": "1.1.0"
+  },
+  "paths": {
+    "/recommander": {
+      "post": {
+        "tags": ["recommandation"],
+        "summary": "Description libre → 3 formules + ingrédients",
+        "description": "Lit la description (LLM, ou profil du métier si l'ambiance n'est pas décrite), applique les ajustements,\npuis recommande. Renvoie toujours des formules ; `question_relance` dit quoi demander pour affiner.",
+        "operationId": "recommander_description_recommander_post",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "",
+              "title": "X-Api-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecoRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecoResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Clé d'API invalide."
+          },
+          "503": {
+            "description": "Données absentes : lancer `python -m reco.preparer` dans ai/."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/recommander/curseurs": {
+      "post": {
+        "tags": ["recommandation"],
+        "summary": "Curseurs → 3 formules + ingrédients (sans LLM, instantané)",
+        "description": "Recommandation directe à partir des 5 curseurs.",
+        "operationId": "recommander_curseurs_recommander_curseurs_post",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "",
+              "title": "X-Api-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CurseursRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecoResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Clé d'API invalide."
+          },
+          "503": {
+            "description": "Données absentes : lancer `python -m reco.preparer` dans ai/."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/site/recommander": {
+      "post": {
+        "tags": ["recommandation", "site"],
+        "summary": "Chatbot du site : demande → produits du site et position des curseurs",
+        "description": "Recommande les produits du catalogue du site (lu sur son API, `SITE_API_URL`).\nToujours une sélection, même pour « Bonjour » : voir `demande_complete` et `question_relance`.",
+        "operationId": "site_recommander_site_recommander_post",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "",
+              "title": "X-Api-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SiteRecoRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteRecoResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Clé d'API invalide."
+          },
+          "422": {
+            "description": "Requête invalide."
+          },
+          "503": {
+            "description": "Catalogue du site injoignable (SITE_API_URL)."
+          }
+        }
+      }
+    },
+    "/site/curseurs": {
+      "post": {
+        "tags": ["recommandation", "site"],
+        "summary": "Curseurs du site réglés par le client → nouveaux produits",
+        "description": "À appeler quand le client bouge un curseur (après ~250 ms sans mouvement). Le modèle traduit le réglage\ndans sa lecture de l'ambiance, garde le contexte de la boutique et reclasse les produits (~20 ms).",
+        "operationId": "site_curseurs_site_curseurs_post",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "",
+              "title": "X-Api-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SiteCurseursRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteCurseursResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Clé d'API invalide."
+          },
+          "422": {
+            "description": "Requête invalide."
+          },
+          "503": {
+            "description": "Catalogue du site injoignable (SITE_API_URL)."
+          }
+        }
+      }
+    },
+    "/answer": {
+      "post": {
+        "summary": "Answer",
+        "description": "Répond à une question. Exige l'en-tête X-API-Key.",
+        "operationId": "answer_answer_post",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "",
+              "title": "X-Api-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Question"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Answer"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AjustementCurseurs": {
+        "properties": {
+          "chaleur": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 10.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chaleur"
+          },
+          "fraicheur": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 10.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fraicheur"
+          },
+          "floral": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 10.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Floral"
+          },
+          "boise": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 10.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Boise"
+          },
+          "intensite": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 10.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Intensite"
+          }
+        },
+        "type": "object",
+        "title": "AjustementCurseurs"
+      },
+      "Answer": {
+        "properties": {
+          "answer": {
+            "type": "string",
+            "title": "Answer"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model"
+          }
+        },
+        "type": "object",
+        "required": ["answer", "model"],
+        "title": "Answer"
+      },
+      "Curseurs": {
+        "properties": {
+          "chaleur": {
+            "type": "integer",
+            "maximum": 10.0,
+            "minimum": 0.0,
+            "title": "Chaleur",
+            "description": "Odeur chaude, gourmande, vanillée, ambrée, épicée (0 à 10).",
+            "examples": [5]
+          },
+          "fraicheur": {
+            "type": "integer",
+            "maximum": 10.0,
+            "minimum": 0.0,
+            "title": "Fraicheur",
+            "description": "Odeur fraîche : agrumes, vert, marin, menthe, propre (0 à 10).",
+            "examples": [5]
+          },
+          "floral": {
+            "type": "integer",
+            "maximum": 10.0,
+            "minimum": 0.0,
+            "title": "Floral",
+            "description": "Odeur de fleurs (0 à 10).",
+            "examples": [5]
+          },
+          "boise": {
+            "type": "integer",
+            "maximum": 10.0,
+            "minimum": 0.0,
+            "title": "Boise",
+            "description": "Bois, cèdre, santal, cuir, mousse (0 à 10).",
+            "examples": [5]
+          },
+          "intensite": {
+            "type": "integer",
+            "maximum": 10.0,
+            "minimum": 0.0,
+            "title": "Intensite",
+            "description": "Force de l'odeur : 0 = à peine perceptible, 10 = très puissante.",
+            "examples": [5]
+          }
+        },
+        "type": "object",
+        "required": ["chaleur", "fraicheur", "floral", "boise", "intensite"],
+        "title": "Curseurs"
+      },
+      "CurseursRequest": {
+        "properties": {
+          "chaleur": {
+            "type": "integer",
+            "maximum": 10.0,
+            "minimum": 0.0,
+            "title": "Chaleur",
+            "description": "Odeur chaude, gourmande, vanillée, ambrée, épicée (0 à 10).",
+            "examples": [5]
+          },
+          "fraicheur": {
+            "type": "integer",
+            "maximum": 10.0,
+            "minimum": 0.0,
+            "title": "Fraicheur",
+            "description": "Odeur fraîche : agrumes, vert, marin, menthe, propre (0 à 10).",
+            "examples": [5]
+          },
+          "floral": {
+            "type": "integer",
+            "maximum": 10.0,
+            "minimum": 0.0,
+            "title": "Floral",
+            "description": "Odeur de fleurs (0 à 10).",
+            "examples": [5]
+          },
+          "boise": {
+            "type": "integer",
+            "maximum": 10.0,
+            "minimum": 0.0,
+            "title": "Boise",
+            "description": "Bois, cèdre, santal, cuir, mousse (0 à 10).",
+            "examples": [5]
+          },
+          "intensite": {
+            "type": "integer",
+            "maximum": 10.0,
+            "minimum": 0.0,
+            "title": "Intensite",
+            "description": "Force de l'odeur : 0 = à peine perceptible, 10 = très puissante.",
+            "examples": [5]
+          },
+          "top_formules": {
+            "type": "integer",
+            "maximum": 13.0,
+            "minimum": 1.0,
+            "title": "Top Formules",
+            "description": "Nombre de formules renvoyées.",
+            "default": 3
+          },
+          "top_ingredients": {
+            "type": "integer",
+            "maximum": 20.0,
+            "minimum": 0.0,
+            "title": "Top Ingredients",
+            "description": "Nombre d'ingrédients Givaudan renvoyés.",
+            "default": 5
+          }
+        },
+        "type": "object",
+        "required": ["chaleur", "fraicheur", "floral", "boise", "intensite"],
+        "title": "CurseursRequest"
+      },
+      "FormuleReco": {
+        "properties": {
+          "rang": {
+            "type": "integer",
+            "title": "Rang",
+            "description": "1 = la plus proche."
+          },
+          "id_formule": {
+            "type": "integer",
+            "title": "Id Formule"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "application": {
+            "type": "string",
+            "title": "Application",
+            "description": "Usage d'origine de la formule de démonstration."
+          },
+          "correspondance_pct": {
+            "type": "number",
+            "title": "Correspondance Pct",
+            "description": "100 = identique aux scores demandés, 0 = opposé sur tous les axes."
+          },
+          "profil": {
+            "$ref": "#/components/schemas/ProfilFormule",
+            "description": "Les 5 scores de la formule (0 à 10, une décimale)."
+          },
+          "famille_dominante": {
+            "type": "string",
+            "title": "Famille Dominante"
+          },
+          "familles_principales": {
+            "type": "string",
+            "title": "Familles Principales",
+            "description": "Part des 3 premières familles dans la formule."
+          },
+          "part_givaudan_pct": {
+            "type": "number",
+            "title": "Part Givaudan Pct",
+            "description": "Part de la formule (hors solvants) faite d'ingrédients Givaudan."
+          },
+          "ingredients_givaudan_principaux": {
+            "type": "string",
+            "title": "Ingredients Givaudan Principaux"
+          },
+          "alerte_catalogue": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Alerte Catalogue",
+            "description": "Ingrédients Givaudan de la formule absents du catalogue 2024."
+          },
+          "pourquoi": {
+            "type": "string",
+            "title": "Pourquoi",
+            "description": "Explication générée par le code (pas par le LLM)."
+          }
+        },
+        "type": "object",
+        "required": [
+          "rang",
+          "id_formule",
+          "nom",
+          "application",
+          "correspondance_pct",
+          "profil",
+          "famille_dominante",
+          "familles_principales",
+          "part_givaudan_pct",
+          "ingredients_givaudan_principaux",
+          "alerte_catalogue",
+          "pourquoi"
+        ],
+        "title": "FormuleReco"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "IngredientReco": {
+        "properties": {
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "famille": {
+            "type": "string",
+            "title": "Famille"
+          },
+          "correspondance_pct": {
+            "type": "number",
+            "title": "Correspondance Pct"
+          },
+          "utilise_dans_une_formule_recommandee": {
+            "type": "boolean",
+            "title": "Utilise Dans Une Formule Recommandee"
+          },
+          "prix_indicatif_eur_kg": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prix Indicatif Eur Kg",
+            "description": "Prix revendeur au détail, 100 g pur, en EUR/kg. Indicatif."
+          }
+        },
+        "type": "object",
+        "required": [
+          "nom",
+          "famille",
+          "correspondance_pct",
+          "utilise_dans_une_formule_recommandee",
+          "prix_indicatif_eur_kg"
+        ],
+        "title": "IngredientReco"
+      },
+      "ProduitSite": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "Identifiant du produit dans le catalogue du site (products.id), ex. « bergamote »."
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "correspondance_pct": {
+            "type": "number",
+            "title": "Correspondance Pct",
+            "description": "100 = profil identique à la demande."
+          },
+          "pourquoi": {
+            "type": "string",
+            "title": "Pourquoi"
+          }
+        },
+        "type": "object",
+        "required": ["id", "nom", "correspondance_pct", "pourquoi"],
+        "title": "ProduitSite"
+      },
+      "ProfilFormule": {
+        "properties": {
+          "chaleur": {
+            "type": "number",
+            "title": "Chaleur"
+          },
+          "fraicheur": {
+            "type": "number",
+            "title": "Fraicheur"
+          },
+          "floral": {
+            "type": "number",
+            "title": "Floral"
+          },
+          "boise": {
+            "type": "number",
+            "title": "Boise"
+          },
+          "intensite": {
+            "type": "number",
+            "title": "Intensite"
+          }
+        },
+        "type": "object",
+        "required": ["chaleur", "fraicheur", "floral", "boise", "intensite"],
+        "title": "ProfilFormule"
+      },
+      "Question": {
+        "properties": {
+          "question": {
+            "type": "string",
+            "title": "Question"
+          }
+        },
+        "type": "object",
+        "required": ["question"],
+        "title": "Question"
+      },
+      "RecoRequest": {
+        "properties": {
+          "description": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 3,
+            "title": "Description",
+            "description": "Description libre de l'ambiance voulue, écrite par la boutique.",
+            "examples": [
+              "Salon de coiffure de quartier, une odeur fraîche et propre, un peu florale, pas trop forte"
+            ]
+          },
+          "ajustements": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AjustementCurseurs"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Curseurs corrigés par la boutique après une première proposition : ils remplacent les scores lus par le LLM sur les axes donnés."
+          },
+          "top_formules": {
+            "type": "integer",
+            "maximum": 13.0,
+            "minimum": 1.0,
+            "title": "Top Formules",
+            "description": "Nombre de formules renvoyées.",
+            "default": 3
+          },
+          "top_ingredients": {
+            "type": "integer",
+            "maximum": 20.0,
+            "minimum": 0.0,
+            "title": "Top Ingredients",
+            "description": "Nombre d'ingrédients Givaudan renvoyés.",
+            "default": 5
+          }
+        },
+        "type": "object",
+        "required": ["description"],
+        "title": "RecoRequest"
+      },
+      "RecoResponse": {
+        "properties": {
+          "scores_utilises": {
+            "$ref": "#/components/schemas/Curseurs",
+            "description": "Scores après lecture du texte et ajustements."
+          },
+          "methode_lecture": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Methode Lecture",
+            "description": "D'où viennent les scores : « llm », « mots-clés » (secours si Ollama ne répond pas), « profil-metier » (seul le métier est donné) ou « profil-par-defaut » (ni métier ni ambiance)."
+          },
+          "metier_detecte": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Metier Detecte",
+            "description": "Type de boutique reconnu, ex. « salon de coiffure »."
+          },
+          "demande_complete": {
+            "type": "boolean",
+            "title": "Demande Complete",
+            "description": "False si la description ne donne ni métier ni ambiance.",
+            "default": true
+          },
+          "question_relance": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Question Relance",
+            "description": "Question à poser pour affiner ; null si la demande suffit."
+          },
+          "formules": {
+            "items": {
+              "$ref": "#/components/schemas/FormuleReco"
+            },
+            "type": "array",
+            "title": "Formules"
+          },
+          "ingredients": {
+            "items": {
+              "$ref": "#/components/schemas/IngredientReco"
+            },
+            "type": "array",
+            "title": "Ingredients"
+          },
+          "modele": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Modele",
+            "description": "Version du modèle et poids des axes appris."
+          },
+          "note_prix": {
+            "type": "string",
+            "title": "Note Prix"
+          }
+        },
+        "type": "object",
+        "required": [
+          "scores_utilises",
+          "formules",
+          "ingredients",
+          "modele",
+          "note_prix"
+        ],
+        "title": "RecoResponse"
+      },
+      "SiteCurseursRequest": {
+        "properties": {
+          "description": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 1,
+            "title": "Description",
+            "description": "La demande de départ du commerçant.",
+            "examples": ["je suis un coiffeur je veux un parfum"]
+          },
+          "complement": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Complement",
+            "description": "« Complétez votre demande », s'il y en a un."
+          },
+          "axes": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "maxItems": 6,
+            "minItems": 1,
+            "title": "Axes",
+            "description": "Identifiants des curseurs affichés par le site (state.axes).",
+            "examples": [[0, 1, 2]]
+          },
+          "curseurs": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "maxItems": 6,
+            "minItems": 1,
+            "title": "Curseurs",
+            "description": "Leur position réglée par le client, 0 à 100 (state.sliders).",
+            "examples": [[25, 66, 90]]
+          },
+          "top": {
+            "type": "integer",
+            "maximum": 18.0,
+            "minimum": 1.0,
+            "title": "Top",
+            "default": 4
+          }
+        },
+        "type": "object",
+        "required": ["description", "axes", "curseurs"],
+        "title": "SiteCurseursRequest"
+      },
+      "SiteCurseursResponse": {
+        "properties": {
+          "reponse": {
+            "type": "string",
+            "title": "Reponse",
+            "description": "Phrase sur l'ambiance obtenue avec ces réglages."
+          },
+          "ambiance": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Ambiance"
+          },
+          "produits": {
+            "items": {
+              "$ref": "#/components/schemas/ProduitSite"
+            },
+            "type": "array",
+            "title": "Produits"
+          },
+          "scores_modele": {
+            "$ref": "#/components/schemas/Curseurs",
+            "description": "Scores du modèle après prise en compte des curseurs."
+          },
+          "scores_demande": {
+            "$ref": "#/components/schemas/Curseurs",
+            "description": "Scores lus dans la demande seule."
+          },
+          "poids_curseurs": {
+            "type": "number",
+            "title": "Poids Curseurs",
+            "description": "Part des curseurs dans le classement : 0 = position conseillée (même résultat que le chatbot), jusqu'à 0,7 s'ils ont beaucoup bougé."
+          },
+          "modele": {
+            "type": "string",
+            "title": "Modele"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reponse",
+          "ambiance",
+          "produits",
+          "scores_modele",
+          "scores_demande",
+          "poids_curseurs",
+          "modele"
+        ],
+        "title": "SiteCurseursResponse"
+      },
+      "SiteRecoRequest": {
+        "properties": {
+          "description": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 1,
+            "title": "Description",
+            "description": "Ce que le commerçant a écrit dans « Décrivez votre boutique ».",
+            "examples": ["je suis un coiffeur je veux un parfum"]
+          },
+          "top": {
+            "type": "integer",
+            "maximum": 18.0,
+            "minimum": 1.0,
+            "title": "Top",
+            "description": "Nombre de produits renvoyés (le site en affiche 4).",
+            "default": 4
+          }
+        },
+        "type": "object",
+        "required": ["description"],
+        "title": "SiteRecoRequest"
+      },
+      "SiteRecoResponse": {
+        "properties": {
+          "type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Type",
+            "description": "Type de boutique du site (shop_types.label), ou null."
+          },
+          "reponse": {
+            "type": "string",
+            "title": "Reponse",
+            "description": "Phrase à afficher, construite par le code à partir des scores."
+          },
+          "ambiance": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Ambiance",
+            "description": "Tags d'ambiance du site retenus (lexicon_entries.tag)."
+          },
+          "curseurs": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Curseurs",
+            "description": "Position conseillée (0 à 100) sur CHAQUE axe du site, dans l'ordre des identifiants : curseurs[2] = axe 2. Le site affiche ceux qu'il veut.",
+            "examples": [[25, 66, 15, 18, 40, 27]]
+          },
+          "produits": {
+            "items": {
+              "$ref": "#/components/schemas/ProduitSite"
+            },
+            "type": "array",
+            "title": "Produits",
+            "description": "Produits recommandés, du plus proche au moins proche."
+          },
+          "scores_modele": {
+            "$ref": "#/components/schemas/Curseurs",
+            "description": "Les 5 scores lus par le modèle (0 à 10)."
+          },
+          "methode_lecture": {
+            "type": "string",
+            "title": "Methode Lecture"
+          },
+          "metier_detecte": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Metier Detecte"
+          },
+          "demande_complete": {
+            "type": "boolean",
+            "title": "Demande Complete"
+          },
+          "question_relance": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Question Relance"
+          },
+          "modele": {
+            "type": "string",
+            "title": "Modele"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "reponse",
+          "ambiance",
+          "curseurs",
+          "produits",
+          "scores_modele",
+          "methode_lecture",
+          "metier_detecte",
+          "demande_complete",
+          "question_relance",
+          "modele"
+        ],
+        "title": "SiteRecoResponse"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": ["loc", "msg", "type"],
+        "title": "ValidationError"
+      }
+    }
+  }
+}
