@@ -76,34 +76,6 @@ export function ensureDerived(): Derived {
   return state.derived!;
 }
 
-/* Recommandation : les 4 parfums les plus proches des curseurs */
-export function ranked() {
-  const s = state.sliders.map((v) => v / 100);
-  const extra = state.extra.toLowerCase();
-  return catalog.products
-    .map((p, i) => {
-      let d = 0;
-      state.axes.forEach((a, k) => {
-        d += Math.abs(p.v[a] - s[k]);
-      });
-      let sc = 1 - d / state.axes.length;
-      p.tags.forEach((t) => {
-        if (extra && extra.includes(t.slice(0, 5))) sc += 0.06;
-      });
-      if (extra && extra.includes(p.name.toLowerCase().slice(0, 5))) sc += 0.15;
-      return { p, sc, i };
-    })
-    .sort((a, b) => b.sc - a.sc || a.i - b.i)
-    .slice(0, 4);
-}
-
-export const matchLabel = (sc: number) =>
-  sc >= 0.85
-    ? 'Correspondance forte'
-    : sc >= 0.75
-      ? 'Correspondance bonne'
-      : 'Correspondance possible';
-
 // La phrase du modèle n'est gardée que si elle ne cite aucune ambiance absente
 // des curseurs (un petit modèle ajoute volontiers des mots que la demande ne
 // contenait pas). Sinon, null : l'appelant la remplace.

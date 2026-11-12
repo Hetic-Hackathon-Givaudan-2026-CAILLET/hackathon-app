@@ -1,4 +1,5 @@
 import { catalog } from './catalog';
+import { resetReco } from './givaudan';
 import type { Derived, Order, Shop, User } from './types';
 
 export const state = {
@@ -28,4 +29,9 @@ export function resetSearch() {
   state.axes = catalog.defaultProfile.axes.slice();
   state.sliders = catalog.defaultProfile.vals.slice();
   state.confirm = null;
+  resetReco();
 }
+
+// Texte envoyé au modèle Givaudan : la demande et son complément éventuel
+export const recoDescription = () =>
+  [state.desc, state.extra].filter(Boolean).join('. ');

@@ -10,8 +10,6 @@ export type Product = {
   tags: string[];
   image: string | null;
   imageFocus: string;
-  // Position sur chaque curseur, dans l'ordre des axes (0 à 1)
-  v: number[];
 };
 
 export type ShopType = {
@@ -86,4 +84,49 @@ export type Derived = {
   axes: number[];
   sliders: number[];
   type: string | null;
+};
+
+// Recommandation Givaudan (POST /api/recommandation, ADR 0007) : 5 notes de 0 à 10
+export const RECO_AXES = [
+  'chaleur',
+  'fraicheur',
+  'floral',
+  'boise',
+  'intensite',
+] as const;
+export type RecoAxe = (typeof RECO_AXES)[number];
+export type RecoScores = Record<RecoAxe, number>;
+
+export type RecoFormule = {
+  rang: number;
+  id_formule: number;
+  // Identifiant du produit à ajouter au panier
+  produit_id: string;
+  nom: string;
+  application: string;
+  correspondance_pct: number;
+  profil: RecoScores;
+  famille_dominante: string;
+  familles_principales: string;
+  part_givaudan_pct: number;
+  ingredients_givaudan_principaux: string;
+  alerte_catalogue: string | null;
+  pourquoi: string;
+};
+
+export type RecoIngredient = {
+  nom: string;
+  famille: string;
+  correspondance_pct: number;
+  utilise_dans_une_formule_recommandee: boolean;
+  prix_indicatif_eur_kg: number | null;
+};
+
+export type RecoResult = {
+  scores_utilises: RecoScores;
+  methode_lecture?: 'llm' | 'mots-clés';
+  formules: RecoFormule[];
+  ingredients: RecoIngredient[];
+  modele: { version: string; poids_axes: RecoScores };
+  note_prix: string;
 };

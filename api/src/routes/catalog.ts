@@ -4,7 +4,7 @@ import { db } from '../db.js';
 export const catalog = Router();
 
 // Tout ce que le front lisait dans des constantes : parfums, curseurs, vocabulaire…
-// Les tableaux sont ordonnés ; un parfum liste ses scores dans l'ordre des axes.
+// Les tableaux sont ordonnés.
 catalog.get('/catalog', async (_req, res) => {
   const [axes, products, shopTypes, lexicon, examples, steps, statuses] =
     await Promise.all([
@@ -12,12 +12,11 @@ catalog.get('/catalog', async (_req, res) => {
         `SELECT id, left_pole AS left, right_pole AS right, short_name AS name
          FROM axes ORDER BY id`,
       ),
+      // Les produits sont les formules Givaudan (db/init/006, issu de ai/data/raw)
       db.query(
-        `SELECT p.id, p.name, p.ref, p.description AS desc, p.tags,
-                p.image, p.image_focus AS "imageFocus",
-                array_agg(s.score::float8 ORDER BY s.axis_id) AS v
-         FROM products p JOIN product_scores s ON s.product_id = p.id
-         WHERE p.active GROUP BY p.id ORDER BY p.position`,
+        `SELECT id, name, ref, description AS desc, tags,
+                image, image_focus AS "imageFocus"
+         FROM products WHERE active ORDER BY position`,
       ),
       db.query(
         `SELECT label, pattern, flags, axes, vals, is_default AS "isDefault"
