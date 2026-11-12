@@ -1,18 +1,87 @@
 <!doctype html>
 <html lang="fr">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hackathon</title>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="color-scheme" content="light dark" />
+    <title>Givaudan — Prototype Human by nature</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
-    <h1>Hackathon</h1>
-    <p id="health">Connexion à l'API…</p>
-    <form>
-      <input name="question" placeholder="Posez une question à l'IA" required />
-      <button>Envoyer</button>
-    </form>
-    <ul id="questions"></ul>
+    <header class="top">
+      <button
+        class="logo"
+        data-act="go"
+        data-to="accueil"
+        aria-label="Givaudan — retour à l’accueil"
+      >
+        <img src="/images/logo.png" alt="Givaudan" />
+      </button>
+      <div class="hright">
+        <button class="hbtn" data-act="go" data-to="compte" aria-label="Compte">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.6"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" />
+          </svg>
+          <span class="t" id="acctLabel">Compte</span>
+        </button>
+        <button class="hbtn" data-act="go" data-to="panier" aria-label="Panier">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.6"
+            aria-hidden="true"
+          >
+            <path d="M2 3h3l2.4 12h11l2.2-8.5H6" />
+            <circle cx="9" cy="20" r="1.4" />
+            <circle cx="17" cy="20" r="1.4" />
+          </svg>
+          <span class="t">Panier</span>
+          <span class="badge" id="badge" hidden>0</span>
+        </button>
+      </div>
+    </header>
+    <div class="layout">
+      <nav class="side" aria-label="Navigation principale">
+        <button class="navbtn" data-act="newchat" data-nav="accueil">
+          Nouvelle conversation
+        </button>
+        <button
+          class="navbtn"
+          data-act="go"
+          data-to="boutique"
+          data-nav="boutique"
+        >
+          Paramétrer votre boutique
+        </button>
+        <button class="navbtn" data-act="go" data-to="suivi" data-nav="suivi">
+          Suivi des commandes
+        </button>
+      </nav>
+      <div class="main">
+        <main id="view" tabindex="-1"></main>
+        <div class="foot">
+          <b>Human by nature</b
+          ><span>Prototype réalisé dans le cadre du Givaudan AI Challenge</span>
+        </div>
+      </div>
+    </div>
+    <div id="toastZone" aria-live="polite" role="status"></div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

@@ -269,6 +269,42 @@ La question envoyée doit apparaître en première ligne avec la réponse géné
 Les identifiants locaux de démonstration sont `app` / `app`; ne réutilisez pas
 ces valeurs pour un déploiement exposé.
 
+### Vérifier le catalogue du prototype Givaudan
+
+```sh
+curl -s http://localhost:3000/api/catalog | head -c 300
+```
+
+Résultat attendu : un JSON avec `axes`, `products`, `shopTypes`… Si l'API
+répond `relation "axes" does not exist`, la base a été créée avant l'ajout des
+tables du prototype : suivez « Ajouter les tables du prototype à une base
+existante » en section 8.
+
+Les autres routes (`/api/me`, `/api/shop`, `/api/orders`) exigent un en-tête
+`X-Customer-Id` contenant un UUID, que le front génère et conserve dans le
+navigateur :
+
+```sh
+curl -s http://localhost:3000/api/orders \
+  -H 'X-Customer-Id: 11111111-2222-4333-8444-555555555555'
+```
+
+Résultat attendu : la commande fictive `2026-0412`, créée au premier appel.
+
+### Tester le chatbot du prototype
+
+```sh
+curl -s -X POST http://localhost:3000/api/chat \
+  -H 'Content-Type: application/json' \
+  -d '{"message":"Je tiens un spa et je veux une ambiance calme et douce","hint":{"type":"spa","ambiance":["apaisant","doux"]}}'
+```
+
+Résultat attendu : un JSON `{"reply":"…","type":"spa"}`, en 2 à 10 secondes
+selon la machine (le premier appel charge le modèle). `hint` est facultatif : le
+front y envoie ce que son analyse par mots-clés a déjà repéré. L'appel utilise
+le même Ollama que `/api/questions`. S'il est éteint, l'API répond `502` et le
+front continue avec l'analyse par mots-clés seule.
+
 ## 6. Contrôles de qualité et build
 
 Dans un terminal à la racine du dépôt, connecté au dev container :
@@ -363,6 +399,21 @@ La base utilise `db/data/` comme stockage local. Les scripts SQL de
 `db/init/` sont joués uniquement lors de l'initialisation d'une base vide. Ne
 supprimez pas `db/data/` pour un dépannage ordinaire : cela effacerait les
 données locales.
+
+### Ajouter les tables du prototype à une base existante
+
+Les scripts `db/init/003-boutique-schema.sql` et `db/init/004-boutique-seed.sql`
+sont joués automatiquement sur une base neuve. Si votre base existe déjà, jouez-les
+une seule fois, dans cet ordre et sans supprimer `db/data/` :
+
+```sh
+docker compose exec -T db psql -U app -d app -v ON_ERROR_STOP=1 < db/init/003-boutique-schema.sql
+docker compose exec -T db psql -U app -d app -v ON_ERROR_STOP=1 < db/init/004-boutique-seed.sql
+```
+
+Un second passage échoue (les tables existent déjà) sans rien modifier. Pour
+repartir de zéro, y compris vos questions de test, arrêtez les conteneurs,
+supprimez `db/data/` puis relancez `docker compose up -d`.
 
 Si le port hôte `5433` est déjà occupé, arrêtez l'autre service qui l'utilise
 ou modifiez le port hôte dans `compose.yaml`. Conservez le port conteneur
