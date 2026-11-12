@@ -1,0 +1,19 @@
+id_produit;familles;justification
+vanille;Gourmand:0.8|Floral:0.2;sucrée, crémeuse, gousse / fleur blanche
+caramel;Gourmand:0.6|Sucré:0.2|Lactonique:0.2;sucre chauffé, beurrée / lait doux
+tonka;Gourmand:0.5|Balsamique:0.3|Poudré:0.2;amande, foin, vanille / touche poudrée
+figue;Vert:0.5|Lactonique:0.3|Boisé:0.2;feuille de figuier, lactée / bois blond
+cedre;Boisé:1.0;bois sec et clair
+santal;Boisé:0.7|Lactonique:0.3;bois crémeux, lacté
+ambre;Ambré:0.6|Balsamique:0.2|Poudré:0.2;chaude, résineuse / miellée, poudrée
+benjoin;Balsamique:0.6|Gourmand:0.4;baume sucré, vanillé
+musc;Musqué:0.5|Poudré:0.3|Frais:0.2;peau propre, linge doux, poudrée
+oranger;Floral:0.7|Hespéridé (agrumes):0.2|Vert:0.1;florale lumineuse / agrume / verte
+bergamote;Hespéridé (agrumes):0.8|Floral:0.2;agrume vif / floral
+rose;Floral:0.7|Poudré:0.2|Fruité:0.1;pétales, poudrée / fruit tendre
+mandarine;Hespéridé (agrumes):0.6|Fruité:0.4;agrume rond, juteux
+gingembre;Épicé:0.5|Frais:0.3|Hespéridé (agrumes):0.2;piquante / fraîche / citron
+cannelle;Épicé:0.7|Gourmand:0.2|Boisé:0.1;épice chaude / sucrée / écorce
+theVert;Vert:0.6|Aromatique (herbes):0.2|Frais:0.2;feuilles infusées, herbacée, propre
+menthe;Menthé:0.8|Aromatique (herbes):0.2;mentholée / herbacée
+vetiver;Terreux:0.5|Boisé:0.4|Vert:0.1;racine terreuse / boisée / herbacée

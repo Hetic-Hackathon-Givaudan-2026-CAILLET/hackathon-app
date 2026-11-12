@@ -1,0 +1,345 @@
+diff --git a/api/.env.example b/api/.env.example
+index a2c9f02..0fa6c26 100644
+--- a/api/.env.example
++++ b/api/.env.example
+@@ -4,4 +4,9 @@ DATABASE_URL=postgres://app:app@db:5432/app
+ # Ollama installé sur la machine hôte (API compatible OpenAI)
+ AI_BASE_URL=http://host.docker.internal:11434/v1
+ AI_MODEL=llama3.2:1b
+-AI_API_KEY=
+\ No newline at end of file
++AI_API_KEY=
++
++# Service IA de l'équipe Data/IA (ai/, port 8000) et sa clé X-API-Key
++# (même valeur que API_KEY dans ai/.env, à demander aux tech-leads)
++MODEL_API_URL=http://localhost:8000
++MODEL_API_KEY=
+\ No newline at end of file
+diff --git a/api/src/config.ts b/api/src/config.ts
+index 05d8b88..ade601b 100644
+--- a/api/src/config.ts
++++ b/api/src/config.ts
+@@ -11,5 +11,8 @@ export const {
+   AI_BASE_URL,
+   AI_MODEL,
+   AI_API_KEY = '',
++  // Service IA de l'équipe Data/IA (ai/, modèle de recommandation)
++  MODEL_API_URL = 'http://localhost:8000',
++  MODEL_API_KEY = '',
+ } = process.env;
+ export const PORT = Number(process.env.PORT ?? 3000);
+diff --git a/api/src/index.ts b/api/src/index.ts
+index cfc94b9..7c576d2 100644
+--- a/api/src/index.ts
++++ b/api/src/index.ts
+@@ -8,6 +8,7 @@ import { catalog } from './routes/catalog.js';
+ import { chat } from './routes/chat.js';
+ import { me } from './routes/me.js';
+ import { orders } from './routes/orders.js';
++import { recommandation } from './routes/recommandation.js';
+ import { shop } from './routes/shop.js';
+ 
+ const app = express();
+@@ -40,7 +41,7 @@ app.post('/api/questions', async (req, res) => {
+ });
+ 
+ // Catalogue : public. Le reste est rattaché au visiteur (en-tête X-Customer-Id)
+-app.use('/api', catalog, chat);
++app.use('/api', catalog, chat, recommandation);
+ app.use('/api', customer, me, shop, orders);
+ 
+ // Même appel pour Ollama, Mistral, OpenAI… : seule la configuration change
+diff --git a/api/src/routes/recommandation.ts b/api/src/routes/recommandation.ts
+new file mode 100644
+index 0000000..6f7e1ec
+--- /dev/null
++++ b/api/src/routes/recommandation.ts
+@@ -0,0 +1,74 @@
++import { Router } from 'express';
++import { MODEL_API_KEY, MODEL_API_URL } from '../config.js';
++import { asObject, HttpError } from '../http.js';
++
++export const recommandation = Router();
++
++// Service IA de l'équipe Data/IA (ai/, voir docs/integration/modele-recommandation.md). Les réponses sont déjà au format
++// du site : identifiants de produits, curseurs de 0 à 100.
++async function forward(path: string, body: unknown, timeoutMs: number) {
++  let response: Response;
++  try {
++    response = await fetch(`${MODEL_API_URL}${path}`, {
++      method: 'POST',
++      headers: {
++        'Content-Type': 'application/json',
++        'X-API-Key': MODEL_API_KEY,
++      },
++      body: JSON.stringify(body),
++      signal: AbortSignal.timeout(timeoutMs),
++    });
++  } catch (err) {
++    console.error('Modèle injoignable :', err);
++    throw new HttpError(502, 'Le modèle de recommandation est indisponible');
++  }
++  if (!response.ok) {
++    console.error(`Modèle : ${response.status} ${await response.text()}`);
++    throw new HttpError(502, 'Le modèle de recommandation est indisponible');
++  }
++  return response.json();
++}
++
++const text = (value: unknown, field: string, required = true) => {
++  const s = typeof value === 'string' ? value.trim() : '';
++  if ((required && !s) || s.length > 1000) {
++    throw new HttpError(400, `${field} : 1 à 1000 caractères attendus`);
++  }
++  return s || null;
++};
++
++const numbers = (value: unknown, field: string) => {
++  if (
++    !Array.isArray(value) ||
++    !value.length ||
++    !value.every((n) => Number.isInteger(n))
++  ) {
++    throw new HttpError(400, `${field} : liste d'entiers attendue`);
++  }
++  return value as number[];
++};
++
++// Chatbot : la demande du commerçant -> produits et position conseillée des curseurs
++recommandation.post('/recommandation', async (req, res) => {
++  const body = asObject(req.body);
++  const description = text(body.description, 'description');
++  // Premier appel lent : le LLM se charge en mémoire
++  res.json(await forward('/site/recommander', { description }, 90_000));
++});
++
++// Curseurs : le client a réglé les curseurs -> nouveaux produits
++recommandation.post('/recommandation/curseurs', async (req, res) => {
++  const body = asObject(req.body);
++  res.json(
++    await forward(
++      '/site/curseurs',
++      {
++        description: text(body.description, 'description'),
++        complement: text(body.complement, 'complement', false),
++        axes: numbers(body.axes, 'axes'),
++        curseurs: numbers(body.curseurs, 'curseurs'),
++      },
++      30_000,
++    ),
++  );
++});
+diff --git a/web/src/actions.ts b/web/src/actions.ts
+index 158f0f1..eadf0e3 100644
+--- a/web/src/actions.ts
++++ b/web/src/actions.ts
+@@ -56,9 +56,69 @@ async function askAssistant(text: string, kw: Derived) {
+   }
+ }
+ 
++// Chatbot : le modèle choisit les produits et conseille la position de chaque
++// curseur ; le site garde ses propres curseurs (profil du type de boutique).
++// Renvoie false si le modèle est indisponible : on garde l'analyse locale.
++async function findWithModel(text: string) {
++  busy(true);
++  try {
++    const r = await api.recommander(text);
++    const profile =
++      (r.type && catalog.profiles[r.type]) || catalog.defaultProfile;
++    state.desc = text;
++    state.extra = '';
++    applyDerived({
++      adjs: r.ambiance.map(
++        (tag) => catalog.lexicon.find((l) => l.tag === tag)?.adj ?? tag,
++      ),
++      tags: r.ambiance,
++      axes: profile.axes.slice(),
++      sliders: profile.axes.map((a) => r.curseurs[a]),
++      type: r.type,
++    });
++    state.modelProducts = r.produits;
++    state.reply = r.question_relance
++      ? `${r.reponse} ${r.question_relance}`
++      : r.reponse;
++    go('selection');
++    return true;
++  } catch (e) {
++    console.warn('Modèle indisponible :', e);
++    return false;
++  } finally {
++    busy(false);
++  }
++}
++
++// Curseurs : le modèle reclasse les produits selon le réglage du client.
++// Seule la dernière demande compte ; en cas d'échec, le calcul local reste affiché.
++let slidersRequest = 0;
++let slidersTimer: ReturnType<typeof setTimeout>;
++function askModelForSliders(delay = 250) {
++  clearTimeout(slidersTimer);
++  slidersTimer = setTimeout(async () => {
++    const id = ++slidersRequest;
++    try {
++      const r = await api.recommanderCurseurs({
++        description: state.desc,
++        complement: state.extra,
++        axes: state.axes,
++        curseurs: state.sliders,
++      });
++      if (id !== slidersRequest) return;
++      state.modelProducts = r.produits;
++      const grid = document.getElementById('grid');
++      if (grid) grid.innerHTML = gridHTML();
++    } catch (e) {
++      console.warn('Modèle indisponible :', e);
++    }
++  }, delay);
++}
++
+ async function find() {
+   const field = document.getElementById('desc') as HTMLTextAreaElement | null;
+   const text = field?.value.trim() || exampleText();
++  if (await findWithModel(text)) return;
+   const kw = derive(text);
+   const ai = await askAssistant(text, kw);
+   state.desc = text;
+@@ -91,6 +151,7 @@ const actions: Record<string, Action> = {
+   ex: (t) => {
+     const x = catalog.examples[+t.dataset.i!];
+     state.desc = x.text;
++    state.modelProducts = null;
+     applyDerived(derive(x.text));
+     state.extra = '';
+     state.reply = null;
+@@ -117,7 +178,9 @@ const actions: Record<string, Action> = {
+       ? (consistentReply(ai.reply, d.tags) ??
+         (d.tags.length ? 'C’est noté, j’ajuste l’ambiance.' : null))
+       : null;
++    state.modelProducts = null;
+     render();
++    askModelForSliders(0);
+   },
+   add: (t) => {
+     const id = t.dataset.id!;
+@@ -354,7 +417,9 @@ export function bindEvents() {
+     if (t.dataset?.slider !== undefined) {
+       state.sliders[+t.dataset.slider] = +t.value;
+       t.style.setProperty('--v', t.value + '%');
++      state.modelProducts = null;
+       $('#grid').innerHTML = gridHTML();
++      askModelForSliders();
+     } else if (t.id === 'p-num') {
+       t.value = t.value
+         .replace(/\D/g, '')
+diff --git a/web/src/api.ts b/web/src/api.ts
+index 29cea88..4a4599b 100644
+--- a/web/src/api.ts
++++ b/web/src/api.ts
+@@ -3,6 +3,8 @@ import type {
+   ChatAnalysis,
+   Order,
+   OrderItem,
++  Recommandation,
++  RecommandationCurseurs,
+   Shop,
+   User,
+ } from './types';
+@@ -65,6 +67,19 @@ export const api = {
+   // `hint` : ce que l'analyse par mots-clés a déjà repéré, pour ancrer la réponse
+   chat: (message: string, hint: { type: string | null; ambiance: string[] }) =>
+     request<ChatAnalysis>('/api/chat', 'POST', { message, hint }),
++  recommander: (description: string) =>
++    request<Recommandation>('/api/recommandation', 'POST', { description }),
++  recommanderCurseurs: (body: {
++    description: string;
++    complement: string;
++    axes: number[];
++    curseurs: number[];
++  }) =>
++    request<RecommandationCurseurs>(
++      '/api/recommandation/curseurs',
++      'POST',
++      body,
++    ),
+   orders: () => request<Order[]>('/api/orders'),
+   createOrder: (items: OrderItem[]) =>
+     request<Order>('/api/orders', 'POST', { items }),
+diff --git a/web/src/recommend.ts b/web/src/recommend.ts
+index 24ae7f5..01c5b53 100644
+--- a/web/src/recommend.ts
++++ b/web/src/recommend.ts
+@@ -78,6 +78,15 @@ export function ensureDerived(): Derived {
+ 
+ /* Recommandation : les 4 parfums les plus proches des curseurs */
+ export function ranked() {
++  if (state.modelProducts) {
++    return state.modelProducts
++      .filter((m) => catalog.productsById[m.id])
++      .map((m, i) => ({
++        p: catalog.productsById[m.id],
++        sc: m.correspondance_pct / 100,
++        i,
++      }));
++  }
+   const s = state.sliders.map((v) => v / 100);
+   const extra = state.extra.toLowerCase();
+   return catalog.products
+diff --git a/web/src/state.ts b/web/src/state.ts
+index bdc362c..2371a65 100644
+--- a/web/src/state.ts
++++ b/web/src/state.ts
+@@ -1,5 +1,5 @@
+ import { catalog } from './catalog';
+-import type { Derived, Order, Shop, User } from './types';
++import type { Derived, ModelProduct, Order, Shop, User } from './types';
+ 
+ export const state = {
+   desc: '',
+@@ -17,6 +17,8 @@ export const state = {
+   prev: null as string | null,
+   shop: {} as Shop,
+   orders: [] as Order[],
++  // Produits choisis par le modèle ; null : calcul local (ranked)
++  modelProducts: null as ModelProduct[] | null,
+ };
+ 
+ // Nouvelle conversation : on repart du profil par défaut
+@@ -25,6 +27,7 @@ export function resetSearch() {
+   state.extra = '';
+   state.reply = null;
+   state.derived = null;
++  state.modelProducts = null;
+   state.axes = catalog.defaultProfile.axes.slice();
+   state.sliders = catalog.defaultProfile.vals.slice();
+   state.confirm = null;
+diff --git a/web/src/types.ts b/web/src/types.ts
+index 727e7ec..b497e58 100644
+--- a/web/src/types.ts
++++ b/web/src/types.ts
+@@ -72,6 +72,26 @@ export type User = {
+   tel: string | null;
+ };
+ 
++// Réponses du modèle de recommandation (équipe Data/IA)
++export type ModelProduct = {
++  id: string;
++  nom: string;
++  correspondance_pct: number;
++};
++export type Recommandation = {
++  type: string | null;
++  reponse: string;
++  ambiance: string[];
++  // Position conseillée sur chaque axe du site : curseurs[idAxe], de 0 à 100
++  curseurs: number[];
++  produits: ModelProduct[];
++  question_relance: string | null;
++};
++export type RecommandationCurseurs = {
++  reponse: string;
++  produits: ModelProduct[];
++};
++
+ // Réponse de POST /api/chat : le type de boutique repéré et une courte réponse
+ export type ChatAnalysis = { reply: string | null; type: string | null };
+ 

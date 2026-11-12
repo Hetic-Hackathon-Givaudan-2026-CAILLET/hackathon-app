@@ -15,7 +15,7 @@ import json
 import re
 import unicodedata
 
-import ollama
+import httpx
 
 from . import config
 from .config import AXES
@@ -92,7 +92,21 @@ SCHEMA = {
     "required": AXES,
 }
 
-_client = ollama.Client(host=config.OLLAMA_HOST)
+def _chat(modele: str, messages: list[dict]) -> str:
+    """Appel direct à l'API Ollama, comme /answer dans main.py (pas de SDK en plus)."""
+    rep = httpx.post(
+        f"{config.OLLAMA_URL}/api/chat",
+        json={
+            "model": modele,
+            "messages": messages,
+            "format": SCHEMA,
+            "stream": False,
+            "options": {"temperature": 0, "num_ctx": 2048},
+        },
+        timeout=120,
+    )
+    rep.raise_for_status()
+    return rep.json()["message"]["content"]
 
 
 def _messages(texte: str, variante: str) -> list[dict]:
@@ -147,13 +161,7 @@ def extraire_llm(texte: str, variante: str = "few_shot", modele: str | None = No
     derniere_erreur = None
     for _ in range(2):
         try:
-            rep = _client.chat(
-                model=modele,
-                messages=_messages(texte, variante),
-                format=SCHEMA,
-                options={"temperature": 0, "num_ctx": 2048},
-            )
-            scores = valider(rep["message"]["content"])
+            scores = valider(_chat(modele, _messages(texte, variante)))
             _cache_set(cle, scores)
             return scores
         except Exception as exc:  # JSON invalide, Ollama injoignable...

@@ -8,7 +8,6 @@ import { catalog } from './routes/catalog.js';
 import { chat } from './routes/chat.js';
 import { me } from './routes/me.js';
 import { orders } from './routes/orders.js';
-import { reco } from './routes/reco.js';
 import { shop } from './routes/shop.js';
 
 const app = express();
@@ -41,7 +40,7 @@ app.post('/api/questions', async (req, res) => {
 });
 
 // Catalogue : public. Le reste est rattaché au visiteur (en-tête X-Customer-Id)
-app.use('/api', catalog, chat, reco);
+app.use('/api', catalog, chat);
 app.use('/api', customer, me, shop, orders);
 
 // Même appel pour Ollama, Mistral, OpenAI… : seule la configuration change

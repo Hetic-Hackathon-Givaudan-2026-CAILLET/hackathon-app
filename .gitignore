@@ -1,35 +1,8 @@
-# Node.js et builds
 node_modules/
 dist/
-
-# Données locales PostgreSQL
-db/data/
-
-# Environnement virtuel
-.venv/
-venv/
-env/
-
-# Base vectorielle (régénérée avec ingest.py)
-chroma_db/
-
-# Python
-__pycache__/
-*.py[cod]
-*.egg-info/
-.pytest_cache/
-
-# Variables d'environnement locales
 .env
-
-# IDE / OS
-.vscode/
-.idea/
-.DS_Store
-Thumbs.db
-
-# Cache des réponses du LLM (régénéré automatiquement)
-data/cache/
-
-# Brouillons Word locaux
-*.docx
+db/data/
+.venv/
+__pycache__/
+# Cache des réponses du LLM du modèle de recommandation
+ai/data/cache/

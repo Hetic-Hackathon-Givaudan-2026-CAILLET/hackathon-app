@@ -3,7 +3,6 @@ import type {
   ChatAnalysis,
   Order,
   OrderItem,
-  Reco,
   Shop,
   User,
 } from './types';
@@ -66,9 +65,6 @@ export const api = {
   // `hint` : ce que l'analyse par mots-clés a déjà repéré, pour ancrer la réponse
   chat: (message: string, hint: { type: string | null; ambiance: string[] }) =>
     request<ChatAnalysis>('/api/chat', 'POST', { message, hint }),
-  // Modèle de recommandation Givaudan : lent au premier appel (chargement du LLM)
-  reco: (description: string) =>
-    request<Reco>('/api/recommandation', 'POST', { description }),
   orders: () => request<Order[]>('/api/orders'),
   createOrder: (items: OrderItem[]) =>
     request<Order>('/api/orders', 'POST', { items }),

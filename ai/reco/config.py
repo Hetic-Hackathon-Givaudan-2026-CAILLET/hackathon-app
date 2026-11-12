@@ -1,11 +1,17 @@
-"""Chemins et réglages du modèle de recommandation."""
+"""Chemins et réglages du modèle de recommandation.
+
+Configuration par variables d'environnement (ADR 0002), lues dans ai/.env :
+    OLLAMA_URL   adresse d'Ollama (partagée avec /answer)
+    RECO_MODEL   modèle utilisé pour lire les descriptions (défaut : qwen2.5:3b,
+                 choisi par le benchmark de l'équipe Data)
+"""
 
 import os
 from pathlib import Path
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent  # ai/
 
-RAW_DIR = Path(os.getenv("RECO_RAW_DIR", BASE_DIR / "data" / "row"))
+RAW_DIR = Path(os.getenv("RECO_RAW_DIR", BASE_DIR / "data" / "raw"))
 PROCESSED_DIR = BASE_DIR / "data" / "processed"
 EVAL_DIR = BASE_DIR / "data" / "eval"
 CACHE_DIR = BASE_DIR / "data" / "cache"
@@ -15,9 +21,8 @@ REPORTS_DIR = BASE_DIR / "reports"
 # Les 5 axes, dans cet ordre partout (curseurs, profils, distances)
 AXES = ["chaleur", "fraicheur", "floral", "boise", "intensite"]
 
-# LLM retenu par le benchmark de l'équipe (benchmark_llm.pdf)
-OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
-RECO_LLM_MODEL = os.getenv("RECO_LLM_MODEL", "qwen2.5:3b")
+OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
+RECO_LLM_MODEL = os.getenv("RECO_MODEL", "qwen2.5:3b")
 
 # Taux de change indicatifs pour comparer les prix en euros.
 # À mettre à jour avant toute utilisation commerciale.

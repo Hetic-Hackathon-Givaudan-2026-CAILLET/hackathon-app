@@ -1,0 +1,410 @@
+{
+  "axes": [
+    {
+      "id": 0,
+      "left": "pétillant",
+      "right": "apaisant",
+      "name": "énergie"
+    },
+    {
+      "id": 1,
+      "left": "chaleureux",
+      "right": "raffiné",
+      "name": "chaleur"
+    },
+    {
+      "id": 2,
+      "left": "floral",
+      "right": "gourmand",
+      "name": "saveur"
+    },
+    {
+      "id": 3,
+      "left": "frais",
+      "right": "boisé",
+      "name": "fraîcheur"
+    },
+    {
+      "id": 4,
+      "left": "léger",
+      "right": "intense",
+      "name": "intensité"
+    },
+    {
+      "id": 5,
+      "left": "doux",
+      "right": "épicé",
+      "name": "caractère"
+    }
+  ],
+  "products": [
+    {
+      "id": "vanille",
+      "name": "Vanille",
+      "ref": "0688",
+      "desc": "Une odeur sucrée, crémeuse et enveloppante, aux notes de gousse séchée et de fleur blanche.",
+      "tags": ["gourmand", "chaleureux", "doux"],
+      "image": "/images/products/vanille.jpg",
+      "imageFocus": "35% 45%",
+      "v": [0.7, 0.15, 0.95, 0.55, 0.45, 0.12]
+    },
+    {
+      "id": "caramel",
+      "name": "Caramel",
+      "ref": "0522",
+      "desc": "Une odeur de sucre chauffé, beurrée et ambrée, avec une pointe de lait doux.",
+      "tags": ["gourmand", "discret", "chaleureux"],
+      "image": "/images/products/caramel.jpg",
+      "imageFocus": "50% 28%",
+      "v": [0.6, 0.2, 0.9, 0.5, 0.5, 0.15]
+    },
+    {
+      "id": "tonka",
+      "name": "Fève tonka",
+      "ref": "0309",
+      "desc": "Une odeur à la fois sucrée et sèche, entre amande, foin coupé et vanille, avec une touche poudrée.",
+      "tags": ["boisé", "chaleureux", "discret"],
+      "image": "/images/products/tonka.jpg",
+      "imageFocus": "50% 50%",
+      "v": [0.65, 0.35, 0.8, 0.8, 0.5, 0.35]
+    },
+    {
+      "id": "figue",
+      "name": "Figue",
+      "ref": "0417",
+      "desc": "Une odeur verte et lactée, entre feuille de figuier, pulpe mûre et bois blond.",
+      "tags": ["naturel", "léger", "apaisant"],
+      "image": "/images/products/figue.jpg",
+      "imageFocus": "45% 62%",
+      "v": [0.55, 0.55, 0.4, 0.4, 0.3, 0.2]
+    },
+    {
+      "id": "cedre",
+      "name": "Cèdre",
+      "ref": "0231",
+      "desc": "Une odeur de bois sec et clair, crayeuse, proche du papier ancien et du crayon taillé.",
+      "tags": ["boisé", "sec", "raffiné"],
+      "image": "/images/products/cedre.jpg",
+      "imageFocus": "50% 55%",
+      "v": [0.6, 0.7, 0.15, 0.92, 0.55, 0.4]
+    },
+    {
+      "id": "santal",
+      "name": "Santal",
+      "ref": "0275",
+      "desc": "Une odeur de bois crémeux et doux, légèrement lactée, au fond velouté.",
+      "tags": ["boisé", "crémeux", "apaisant"],
+      "image": "/images/products/santal.jpg",
+      "imageFocus": "50% 30%",
+      "v": [0.88, 0.6, 0.4, 0.85, 0.4, 0.25]
+    },
+    {
+      "id": "ambre",
+      "name": "Ambre",
+      "ref": "0344",
+      "desc": "Une odeur chaude et résineuse, miellée et poudrée, qui laisse un sillage doux et durable.",
+      "tags": ["résineux", "chaleureux", "intense"],
+      "image": "/images/products/ambre.jpg",
+      "imageFocus": "50% 50%",
+      "v": [0.55, 0.3, 0.7, 0.65, 0.8, 0.45]
+    },
+    {
+      "id": "benjoin",
+      "name": "Benjoin",
+      "ref": "0391",
+      "desc": "Une odeur de baume tiède, sucrée et vanillée, avec une pointe de fumée douce.",
+      "tags": ["baumé", "doux", "gourmand"],
+      "image": "/images/products/benjoin.jpg",
+      "imageFocus": "80% 55%",
+      "v": [0.72, 0.4, 0.78, 0.6, 0.55, 0.3]
+    },
+    {
+      "id": "musc",
+      "name": "Musc blanc",
+      "ref": "0156",
+      "desc": "Une odeur de peau propre et de linge doux, poudrée et très discrète.",
+      "tags": ["poudré", "discret", "apaisant"],
+      "image": "/images/products/musc.jpg",
+      "imageFocus": "50% 55%",
+      "v": [0.92, 0.82, 0.45, 0.45, 0.15, 0.1]
+    },
+    {
+      "id": "oranger",
+      "name": "Fleur d’oranger",
+      "ref": "0128",
+      "desc": "Une odeur florale lumineuse, miellée et légèrement verte, avec une pointe d’agrume.",
+      "tags": ["floral", "frais", "délicat"],
+      "image": "/images/products/oranger.jpg",
+      "imageFocus": "50% 50%",
+      "v": [0.4, 0.55, 0.05, 0.18, 0.3, 0.2]
+    },
+    {
+      "id": "bergamote",
+      "name": "Bergamote",
+      "ref": "0099",
+      "desc": "Un agrume vif et frais, à la fois acidulé, floral et légèrement amer.",
+      "tags": ["frais", "pétillant", "vif"],
+      "image": "/images/products/bergamote.jpg",
+      "imageFocus": "50% 58%",
+      "v": [0.08, 0.7, 0.2, 0.05, 0.35, 0.25]
+    },
+    {
+      "id": "rose",
+      "name": "Rose poudrée",
+      "ref": "0187",
+      "desc": "Une odeur de pétales de rose, douce et poudrée, avec une nuance de fruit tendre.",
+      "tags": ["floral", "poudré", "raffiné"],
+      "image": "/images/products/rose.jpg",
+      "imageFocus": "50% 40%",
+      "v": [0.5, 0.88, 0.05, 0.4, 0.35, 0.2]
+    },
+    {
+      "id": "mandarine",
+      "name": "Mandarine",
+      "ref": "0063",
+      "desc": "Un agrume rond et sucré, juteux, qui évoque la pulpe fraîche et le zeste.",
+      "tags": ["pétillant", "gourmand", "chaleureux"],
+      "image": "/images/products/mandarine.jpg",
+      "imageFocus": "55% 62%",
+      "v": [0.12, 0.28, 0.6, 0.12, 0.4, 0.3]
+    },
+    {
+      "id": "gingembre",
+      "name": "Gingembre",
+      "ref": "0074",
+      "desc": "Une odeur piquante et fraîche, entre racine râpée, citron et épice sèche.",
+      "tags": ["épicé", "pétillant", "intense"],
+      "image": "/images/products/gingembre.jpg",
+      "imageFocus": "45% 55%",
+      "v": [0.18, 0.32, 0.55, 0.25, 0.65, 0.9]
+    },
+    {
+      "id": "cannelle",
+      "name": "Cannelle",
+      "ref": "0215",
+      "desc": "Une odeur d’épice chaude et sucrée, boisée, qui évoque l’écorce roulée.",
+      "tags": ["épicé", "chaleureux", "gourmand"],
+      "image": "/images/products/cannelle.jpg",
+      "imageFocus": "50% 50%",
+      "v": [0.35, 0.2, 0.78, 0.55, 0.7, 0.88]
+    },
+    {
+      "id": "theVert",
+      "name": "Thé vert",
+      "ref": "0142",
+      "desc": "Une odeur de feuilles infusées, fraîche, légèrement herbacée et très propre.",
+      "tags": ["frais", "léger", "raffiné"],
+      "image": "/images/products/theVert.jpg",
+      "imageFocus": "40% 55%",
+      "v": [0.3, 0.72, 0.25, 0.2, 0.2, 0.2]
+    },
+    {
+      "id": "menthe",
+      "name": "Menthe poivrée",
+      "ref": "0033",
+      "desc": "Une odeur glaciale et tonique, mentholée, avec une pointe herbacée et piquante.",
+      "tags": ["frais", "tonique", "intense"],
+      "image": "/images/products/menthe.jpg",
+      "imageFocus": "50% 45%",
+      "v": [0.05, 0.6, 0.1, 0.08, 0.85, 0.55]
+    },
+    {
+      "id": "vetiver",
+      "name": "Vétiver",
+      "ref": "0262",
+      "desc": "Une odeur de racine sèche et terreuse, boisée et fumée, avec une nuance herbacée.",
+      "tags": ["boisé", "terreux", "intense"],
+      "image": "/images/products/vetiver.jpg",
+      "imageFocus": "50% 50%",
+      "v": [0.5, 0.6, 0.05, 0.95, 0.7, 0.4]
+    }
+  ],
+  "shopTypes": [
+    {
+      "label": "librairie",
+      "pattern": "librairie|livre",
+      "flags": "i",
+      "axes": [0, 1, 3],
+      "vals": [60, 30, 70],
+      "isDefault": false
+    },
+    {
+      "label": "boutique de thés",
+      "pattern": "(?<![a-zà-ÿ])th[ée]s?(?![a-zà-ÿ])",
+      "flags": "i",
+      "axes": [0, 3, 5],
+      "vals": [70, 45, 25],
+      "isDefault": false
+    },
+    {
+      "label": "spa",
+      "pattern": "spa|bien-être|massage",
+      "flags": "i",
+      "axes": [0, 2, 4],
+      "vals": [80, 30, 25],
+      "isDefault": false
+    },
+    {
+      "label": "bijouterie",
+      "pattern": "bijou",
+      "flags": "i",
+      "axes": [1, 2, 4],
+      "vals": [70, 30, 30],
+      "isDefault": false
+    },
+    {
+      "label": "boutique de sport",
+      "pattern": "running|sneaker|articles? de sport|boutique de sport",
+      "flags": "i",
+      "axes": [0, 3, 4],
+      "vals": [25, 25, 70],
+      "isDefault": false
+    },
+    {
+      "label": "hôtel",
+      "pattern": "hôtel|hotel",
+      "flags": "i",
+      "axes": [1, 2, 4],
+      "vals": [75, 35, 40],
+      "isDefault": false
+    },
+    {
+      "label": "salle de sport",
+      "pattern": "salle de sport|fitness|gym",
+      "flags": "i",
+      "axes": [0, 3, 4],
+      "vals": [25, 25, 70],
+      "isDefault": false
+    },
+    {
+      "label": "café",
+      "pattern": "café|cafe",
+      "flags": "i",
+      "axes": [1, 3, 5],
+      "vals": [35, 60, 60],
+      "isDefault": false
+    },
+    {
+      "label": "boutique de bougies",
+      "pattern": "bougie",
+      "flags": "i",
+      "axes": [0, 2, 4],
+      "vals": [70, 40, 50],
+      "isDefault": false
+    },
+    {
+      "label": "concept store",
+      "pattern": "concept",
+      "flags": "i",
+      "axes": [0, 1, 4],
+      "vals": [50, 60, 40],
+      "isDefault": false
+    },
+    {
+      "label": "par défaut",
+      "pattern": null,
+      "flags": "i",
+      "axes": [0, 1, 2],
+      "vals": [55, 25, 70],
+      "isDefault": true
+    }
+  ],
+  "lexicon": [
+    {
+      "pattern": "chaleureu",
+      "flags": "i",
+      "adj": "chaleureuse",
+      "tag": "chaleureux",
+      "axis": 1,
+      "value": 15
+    },
+    {
+      "pattern": "raffin|élégan|elegan|chic|luxe|sophistiq|prestige",
+      "flags": "i",
+      "adj": "raffinée",
+      "tag": "raffiné",
+      "axis": 1,
+      "value": 85
+    },
+    {
+      "pattern": "apais|calme|zen|serein|détend|detend|relax",
+      "flags": "i",
+      "adj": "apaisante",
+      "tag": "apaisant",
+      "axis": 0,
+      "value": 85
+    },
+    {
+      "pattern": "pétill|petill|vif|dynamiq|énerg|energ|tonic|sportif|joyeu",
+      "flags": "i",
+      "adj": "pétillante",
+      "tag": "pétillant",
+      "axis": 0,
+      "value": 12
+    },
+    {
+      "pattern": "frais|fraîch|fraich|agrume|marin|aérien|aerien",
+      "flags": "i",
+      "adj": "fraîche",
+      "tag": "frais",
+      "axis": 3,
+      "value": 12
+    },
+    {
+      "pattern": "bois|cèdre|cedre|santal|forêt|foret|vieux livres",
+      "flags": "i",
+      "adj": "boisée",
+      "tag": "boisé",
+      "axis": 3,
+      "value": 88
+    },
+    {
+      "pattern": "intens|puissant|marqué|sillage",
+      "flags": "i",
+      "adj": "intense",
+      "tag": "intense",
+      "axis": 4,
+      "value": 85
+    },
+    {
+      "pattern": "léger|leger|discr[eè]t|subtil|délicat|delicat",
+      "flags": "i",
+      "adj": "légère",
+      "tag": "léger",
+      "axis": 4,
+      "value": 15
+    },
+    {
+      "pattern": "épic|epic|poivr|cannelle|gingembre",
+      "flags": "i",
+      "adj": "épicée",
+      "tag": "épicé",
+      "axis": 5,
+      "value": 88
+    },
+    {
+      "pattern": "doux|douce|rond|enveloppant",
+      "flags": "i",
+      "adj": "douce",
+      "tag": "doux",
+      "axis": 5,
+      "value": 12
+    },
+    {
+      "pattern": "flor|fleur",
+      "flags": "i",
+      "adj": "florale",
+      "tag": "floral",
+      "axis": 2,
+      "value": 12
+    },
+    {
+      "pattern": "gourmand|sucr|vanill|caramel",
+      "flags": "i",
+      "adj": "gourmande",
+      "tag": "gourmand",
+      "axis": 2,
+      "value": 88
+    }
+  ]
+}

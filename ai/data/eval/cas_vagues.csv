@@ -1,0 +1,19 @@
+id;description;formules_pertinentes;origine_etiquette
+1;je suis un coiffeur je veux un parfum;7|8;cas 13, 39
+2;salon de coiffure;7|8;cas 13, 39
+3;Je suis barbier, il me faut un parfum pour ma boutique;12;cas 5
+4;J'ai une boulangerie;1;cas 2
+5;Je tiens une librairie;12|1|6;cas 24
+6;Salle de sport, je cherche un parfum d'ambiance;13|7|4;cas 10
+7;Je suis fleuriste;9|8;cas 7
+8;Je travaille dans une pharmacie;8|7|2;cas 17
+9;Bijouterie en centre-ville;11|10;cas 21
+10;Je gère un hôtel;11|10;cas 12
+11;Je tiens un glacier;4;cas 22
+12;Une crêperie;1;cas 18
+13;Boutique de lingerie;10|11;cas 6
+14;Je dirige un spa;4|7;cas 4
+15;Cabinet de massage;11|8;cas 27
+16;Bar à jus de fruits;5|4;cas 38
+17;Magasin de bougies;1|6;cas 19
+18;Une laverie automatique;2|8;cas 3

@@ -1182,90 +1182,33 @@ body[data-view='accueil'] .main {
   max-width: none;
 }
 
-/* Recommandation du modèle Givaudan */
-.reco {
-  margin-bottom: 32px;
-}
-.reco h2 {
-  margin-bottom: 8px;
-}
-.reco .small {
-  font-size: 0.85em;
-}
-.rscores {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 6px 16px;
-  margin: 8px 0 16px;
-}
-.rscores.small {
-  grid-template-columns: 1fr;
-  gap: 4px;
-  font-size: 0.85em;
-}
-.rbar {
-  display: grid;
-  grid-template-columns: 5.5em 1fr 1.5em;
-  align-items: center;
-  gap: 8px;
-}
-.rbar b {
-  text-align: right;
-}
-.rtrack {
-  height: 6px;
-  border-radius: 3px;
-  background: var(--subtle);
-  overflow: hidden;
-}
-.rtrack > span {
-  display: block;
-  height: 100%;
-  background: var(--action);
-}
-.rgrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 16px;
-}
-.rcard {
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.rtop {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.rtop h3 {
-  flex: 1;
+/* Trois questions pour guider la description, discrètes et lisibles */
+.guide {
+  list-style: none;
   margin: 0;
-  font-size: 1em;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 28px;
+  font-size: 14px;
+  color: var(--text2);
+  counter-reset: guide;
 }
-.rrank {
-  width: 1.6em;
-  height: 1.6em;
-  border-radius: 50%;
+.guide li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  counter-increment: guide;
+}
+.guide li::before {
+  content: counter(guide);
+  flex: none;
+  width: 20px;
+  height: 20px;
   display: grid;
   place-items: center;
-  background: var(--action);
-  color: var(--on-action);
-  font-size: 0.85em;
-}
-.ralert {
-  color: var(--err);
-  font-size: 0.85em;
-  margin: 0;
-}
-.rsub {
-  margin: 24px 0 8px;
-  font-size: 1em;
-}
-.ringr {
-  margin: 0 0 8px;
-  padding-left: 1.2em;
-  display: grid;
-  gap: 4px;
+  border: 1px solid var(--line2);
+  border-radius: 50%;
+  font-size: 11px;
+  line-height: 1;
 }
