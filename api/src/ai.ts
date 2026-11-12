@@ -10,7 +10,7 @@ export type ChatMessage = {
 // Seule la configuration (api/.env) change d'un fournisseur à l'autre.
 export async function complete(
   messages: ChatMessage[],
-  { json = false, timeoutMs = 60_000 } = {},
+  { json = false, timeoutMs = 60_000, model = AI_MODEL } = {},
 ): Promise<string> {
   let response: Response;
   try {
@@ -21,7 +21,7 @@ export async function complete(
         Authorization: `Bearer ${AI_API_KEY}`,
       },
       body: JSON.stringify({
-        model: AI_MODEL,
+        model,
         messages,
         // Réponses reproductibles : un petit modèle local est plus fiable sans hasard
         temperature: 0,

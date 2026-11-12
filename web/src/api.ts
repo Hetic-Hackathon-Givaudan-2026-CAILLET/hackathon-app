@@ -3,6 +3,8 @@ import type {
   ChatAnalysis,
   Order,
   OrderItem,
+  RecoResult,
+  RecoScores,
   Shop,
   User,
 } from './types';
@@ -65,6 +67,12 @@ export const api = {
   // `hint` : ce que l'analyse par mots-clés a déjà repéré, pour ancrer la réponse
   chat: (message: string, hint: { type: string | null; ambiance: string[] }) =>
     request<ChatAnalysis>('/api/chat', 'POST', { message, hint }),
+  // Recommandation Givaudan : lecture de la description par le modèle de langage
+  recommandation: (description: string) =>
+    request<RecoResult>('/api/recommandation', 'POST', { description }),
+  // Mêmes résultats à partir des 5 curseurs, sans modèle de langage
+  recommandationCurseurs: (scores: RecoScores) =>
+    request<RecoResult>('/api/recommandation/curseurs', 'POST', scores),
   orders: () => request<Order[]>('/api/orders'),
   createOrder: (items: OrderItem[]) =>
     request<Order>('/api/orders', 'POST', { items }),

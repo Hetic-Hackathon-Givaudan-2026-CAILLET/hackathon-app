@@ -1,6 +1,5 @@
 import { api, ApiError } from './api';
 import { catalog } from './catalog';
-import { gridHTML } from './components';
 import {
   applyDerived,
   consistentReply,
@@ -8,10 +7,11 @@ import {
   exampleText,
   templateReply,
 } from './recommend';
+import { flipCard, loadReco, moveRecoSlider } from './givaudan';
 import { go, render, setErr, toast } from './render';
 import { SHOP } from './shopForm';
-import { resetSearch, state } from './state';
-import type { Derived, Shop, User } from './types';
+import { recoDescription, resetSearch, state } from './state';
+import type { Derived, RecoAxe, Shop, User } from './types';
 import { $ } from './util';
 
 const input = (id: string) => document.getElementById(id) as HTMLInputElement;
@@ -337,6 +337,8 @@ const actions: Record<string, Action> = {
     }
   },
   reload: () => location.reload(),
+  'reco-retry': () => loadReco(recoDescription()),
+  flip: (t) => flipCard(t.closest<HTMLElement>('.flipcard')!),
 };
 
 export function bindEvents() {
@@ -351,10 +353,9 @@ export function bindEvents() {
   });
   document.addEventListener('input', (e) => {
     const t = e.target as HTMLInputElement;
-    if (t.dataset?.slider !== undefined) {
-      state.sliders[+t.dataset.slider] = +t.value;
-      t.style.setProperty('--v', t.value + '%');
-      $('#grid').innerHTML = gridHTML();
+    if (t.dataset?.recoAxis !== undefined) {
+      t.style.setProperty('--v', +t.value * 10 + '%');
+      moveRecoSlider(t.dataset.recoAxis as RecoAxe, +t.value);
     } else if (t.id === 'p-num') {
       t.value = t.value
         .replace(/\D/g, '')

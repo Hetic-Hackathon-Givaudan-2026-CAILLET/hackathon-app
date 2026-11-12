@@ -12,7 +12,7 @@ export function panier() {
     .map((id) => {
       const p = catalog.productsById[id];
       const q = state.cart[id];
-      return `<div class="card line">${photo(p)}<div><h3>${esc(p.name)}</h3><span class="ref">Réf. démo ${p.ref}</span></div><div class="qty"><button data-act="qty" data-id="${id}" data-d="-1" aria-label="Diminuer la quantité de ${esc(p.name)}">−</button><output aria-live="polite">${q}</output><button data-act="qty" data-id="${id}" data-d="1" aria-label="Augmenter la quantité de ${esc(p.name)}">+</button></div><button class="linkbtn rm" data-act="remove" data-id="${id}">Retirer</button></div>`;
+      return `<div class="card line">${photo(p)}<div><h3>${esc(p.name)}</h3><span class="ref">Formule Givaudan ${p.ref}</span></div><div class="qty"><button data-act="qty" data-id="${id}" data-d="-1" aria-label="Diminuer la quantité de ${esc(p.name)}">−</button><output aria-live="polite">${q}</output><button data-act="qty" data-id="${id}" data-d="1" aria-label="Augmenter la quantité de ${esc(p.name)}">+</button></div><button class="linkbtn rm" data-act="remove" data-id="${id}">Retirer</button></div>`;
     })
     .join('');
   return `${stepsHeader('Panier')}<div class="lines">${lines}</div><div class="card sum"><div class="row"><span>Sous-total</span><b style="font-weight:500">Sur devis</b></div><p class="hint">Livraison calculée à l’étape suivante</p><button class="btn" data-act="checkout">Commander</button></div>`;

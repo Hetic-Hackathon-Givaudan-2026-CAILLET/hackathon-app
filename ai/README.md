@@ -46,6 +46,19 @@ référence par mots-clés sans IA.
 
 Tests (sans LLM) : `python -m pytest tests -q`.
 
+## Utilisation par le site (ADR 0007)
+
+Le site n'appelle pas ce service : `api/src/reco.ts` reprend le moteur en
+TypeScript et lit les données dans PostgreSQL. Après `reco.preparer` ou
+`reco.entrainer`, régénérer les données de la base :
+
+```sh
+python -m reco.exporter_sql   # écrit db/init/006-givaudan-seed.sql
+```
+
+Toute modification de `moteur.py` ou `extraction.py` est à reporter dans
+`api/src/reco.ts`.
+
 Les notes des familles olfactives et les familles ajoutées à la main
 (`reco/referentiels.py`) sont des choix de l'équipe, à faire valider par un
 parfumeur Givaudan.

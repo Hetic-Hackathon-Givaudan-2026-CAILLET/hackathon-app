@@ -1182,33 +1182,276 @@ body[data-view='accueil'] .main {
   max-width: none;
 }
 
-/* Trois questions pour guider la description, discrètes et lisibles */
-.guide {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px 28px;
-  font-size: 14px;
-  color: var(--text2);
-  counter-reset: guide;
+/* Recommandation Givaudan (ADR 0007) : curseurs du modèle, formules, ingrédients */
+.reco {
+  margin-bottom: 8px;
 }
-.guide li {
+.reco h2 {
+  margin-bottom: 4px;
+}
+.reco-sliders {
+  margin: 8px 0 24px;
+}
+.reco-slider {
+  grid-template-columns: 220px minmax(0, 1fr) 32px;
+  margin: 10px 0;
+}
+.reco-slider label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.reco-slider label b {
+  font-weight: 500;
+}
+.reco-slider label .hint {
+  font-size: 12px;
+}
+.reco-slider output {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+.reco-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+.reco-formule {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.reco-formule p {
+  margin: 0;
+}
+.reco-head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: start;
+}
+.reco-head h3 {
+  margin: 0 0 2px;
+}
+.reco-rang {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--action);
+  color: var(--on-action);
+  font-size: 13px;
+  font-weight: 500;
+}
+.reco-pct {
+  font-size: 18px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.reco-why {
+  font-size: 14px;
+  line-height: 1.4;
+}
+.reco-profil {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+}
+.reco-profil div {
+  display: grid;
+  grid-template-columns: 80px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  font-size: 12px;
+}
+.reco-profil dt {
+  color: var(--text2);
+}
+.reco-profil dd {
+  margin: 0;
   display: flex;
   align-items: center;
   gap: 8px;
-  counter-increment: guide;
 }
-.guide li::before {
-  content: counter(guide);
-  flex: none;
-  width: 20px;
-  height: 20px;
+.reco-profil .bar {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(
+    to right,
+    var(--text) var(--v),
+    var(--line2) var(--v)
+  );
+}
+.reco-profil .n {
+  width: 28px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.reco-alerte {
+  font-size: 13px;
+  color: var(--text2);
+  background: var(--subtle);
+  border-radius: 4px;
+  padding: 8px 12px;
+}
+.reco-sub {
+  margin: 32px 0 12px;
+}
+.reco-table {
+  overflow-x: auto;
+}
+.reco-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.reco-table th,
+.reco-table td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+.reco-table th {
+  font-weight: 500;
+  color: var(--text2);
+}
+.reco-tag {
+  font-size: 11px;
+  color: var(--ok);
+  margin-left: 6px;
+}
+.reco-note {
+  margin-top: 8px;
+  font-size: 12px;
+}
+@media (max-width: 700px) {
+  .reco-slider {
+    grid-template-columns: minmax(0, 1fr) 32px;
+    gap: 4px 12px;
+  }
+  .reco-slider label {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Cartes de formules retournables : photo et correspondance devant, détails derrière */
+.flipcard {
+  display: grid;
+  perspective: 1200px;
+}
+.flipcard .face {
+  grid-area: 1 / 1;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transition:
+    transform 0.5s ease,
+    opacity 0s linear 0.25s;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+}
+.flipcard .face-front {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  cursor: pointer;
+}
+.flipcard .face-back {
+  transform: rotateY(180deg);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.flipcard .face-back p {
+  margin: 0;
+}
+.flipcard.is-flipped .face-front {
+  transform: rotateY(-180deg);
+}
+.flipcard.is-flipped .face-back {
+  transform: rotateY(0);
+}
+.flip-photo {
+  position: relative;
+  display: block;
+  height: 180px;
+  background: var(--photo);
+}
+.flip-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.flip-rang {
+  position: absolute;
+  top: 12px;
+  left: 12px;
   display: grid;
   place-items: center;
-  border: 1px solid var(--line2);
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  font-size: 11px;
-  line-height: 1;
+  background: var(--action);
+  color: var(--on-action);
+  font-size: 13px;
+  font-weight: 500;
+}
+.flip-pct {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 0 0 1px var(--line);
+}
+.flip-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+  flex: 1;
+}
+.flip-name {
+  font-size: 20px;
+  font-weight: 500;
+}
+.flip-more {
+  margin-top: auto;
+  padding-top: 8px;
+  font-size: 13px;
+  color: var(--text2);
+}
+.flipcard .face-front:hover .flip-more,
+.flipcard .face-front:focus-visible .flip-more {
+  color: var(--text);
+  text-decoration: underline;
+}
+.flip-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+}
+.flip-actions .btn {
+  flex: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .flipcard .face {
+    transition: none;
+  }
 }

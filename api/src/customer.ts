@@ -36,7 +36,8 @@ async function ensureCustomer(id: string) {
     [id.toLowerCase()],
   );
   await db.query(
-    "INSERT INTO order_items (order_id, product_id, qty) VALUES ($1, 'tonka', 1)",
+    `INSERT INTO order_items (order_id, product_id, qty)
+     SELECT $1, id, 1 FROM products WHERE active ORDER BY position LIMIT 1`,
     [rows[0].id],
   );
 }

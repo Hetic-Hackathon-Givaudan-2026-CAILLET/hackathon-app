@@ -1,4 +1,5 @@
-import { state } from './state';
+import { ensureReco } from './givaudan';
+import { recoDescription, state } from './state';
 import { $, esc } from './util';
 import { VIEWS } from './views';
 
@@ -12,6 +13,8 @@ export function render() {
   const v = current();
   $('#view').innerHTML = VIEWS[v]();
   document.body.dataset.view = v;
+  // Recommandation Givaudan de la demande affichée (chargée en arrière-plan)
+  if (v === 'selection') ensureReco(recoDescription());
   document.querySelectorAll<HTMLElement>('.navbtn').forEach((b) => {
     if (b.dataset.nav === v) b.setAttribute('aria-current', 'page');
     else b.removeAttribute('aria-current');

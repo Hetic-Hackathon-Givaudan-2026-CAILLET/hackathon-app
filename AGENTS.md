@@ -10,12 +10,13 @@ Les décisions d'architecture sont dans `docs/adr/`. Les citer (par numéro) qua
 - [ADR 0002](docs/adr/0002-fournisseur-ia.md) : API de chat compatible OpenAI, avec Ollama en local. URL, modèle et clé éventuelle viennent des variables d'environnement, jamais codés en dur.
 - [ADR 0003](docs/adr/0003-stack-applicative.md) : Node.js 24, TypeScript, Express (API) et Vite (front). ESLint, Prettier et la CI garantissent un style commun.
 - [ADR 0004](docs/adr/0004-budget-et-perimetre.md) : budget à zéro, aucun service payant ni envoi de données à un tiers. Hors périmètre : authentification, limitation de débit, RAG, déploiement de production, tests fonctionnels automatisés, service Python `ai/` dans l'application principale.
+- [ADR 0007](docs/adr/0007-recommandation-givaudan.md) (proposée) : recommandation Givaudan portée en TypeScript dans l'API (`api/src/reco.ts`), données exportées de `ai/` vers `db/init/005-006` par `python -m reco.exporter_sql`.
 
 ## Structure
 
 - `api/` : API Express en TypeScript (`api/src/index.ts`).
 - `web/` : front Vite en TypeScript.
-- `db/init/` : scripts SQL joués au premier démarrage de la base (`001-schema.sql`, `002-seed.sql`). `db/data/` contient les données locales et est ignoré par git.
+- `db/init/` : scripts SQL joués au premier démarrage de la base (`001-schema.sql`, `002-seed.sql`, …). `006-givaudan-seed.sql` est généré depuis `ai/`, ne pas le modifier à la main. `db/data/` contient les données locales et est ignoré par git.
 - `ai/` : service Python, hors de l'application principale (ADR 0004).
 - `compose.yaml` : stack de développement (`dev` et `db`).
 

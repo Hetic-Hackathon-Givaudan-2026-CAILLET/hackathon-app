@@ -431,6 +431,7 @@ dans [docs/adr/](docs/adr/) :
 - [0004 : budget à zéro euro](docs/adr/0004-budget-zero.md)
 - [0005 : périmètre exclu](docs/adr/0005-perimetre-exclu.md)
 - [0006 : dev container avec Docker Compose](docs/adr/0006-environnement-dev-container.md)
+- [0007 : recommandation Givaudan dans l'API](docs/adr/0007-recommandation-givaudan.md) (proposée)
 
 En résumé : Node.js 24 et TypeScript pour l'API et le front, Express, Vite,
 PostgreSQL 17 via Compose, et Ollama (`llama3.2:1b`) en local, sans frais d'API.
