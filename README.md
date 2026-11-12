@@ -3,6 +3,9 @@
 Application de démonstration composée d'un front web, d'une API Node.js,
 d'une base PostgreSQL et d'un modèle de langage local via Ollama.
 
+Livrables de l'équipe Data/IA (lundi, mardi, jeudi) :
+[LIVRABLE_DATA.md](LIVRABLE_DATA.md).
+
 Ce guide décrit les commandes à effectuer depuis un clone neuf. Les commandes
 Docker se lancent sur votre machine hôte, sauf indication contraire. Les
 commandes npm se lancent dans le dev container. Les exemples utilisent un

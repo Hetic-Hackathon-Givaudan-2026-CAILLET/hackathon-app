@@ -1,0 +1,683 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "IA de l'équipe Data/IA",
+    "version": "1.1.0"
+  },
+  "paths": {
+    "/recommander": {
+      "post": {
+        "tags": ["recommandation"],
+        "summary": "Description libre → 3 formules + ingrédients",
+        "description": "Lit la description avec Ollama (secours : mots-clés), applique les ajustements, puis recommande.",
+        "operationId": "recommander_description_recommander_post",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "",
+              "title": "X-Api-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecoRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecoResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Clé d'API invalide."
+          },
+          "503": {
+            "description": "Données absentes : lancer `python -m reco.preparer` dans ai/."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/recommander/curseurs": {
+      "post": {
+        "tags": ["recommandation"],
+        "summary": "Curseurs → 3 formules + ingrédients (sans LLM, instantané)",
+        "description": "Recommandation directe à partir des 5 curseurs.",
+        "operationId": "recommander_curseurs_recommander_curseurs_post",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "",
+              "title": "X-Api-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CurseursRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecoResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Clé d'API invalide."
+          },
+          "503": {
+            "description": "Données absentes : lancer `python -m reco.preparer` dans ai/."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/answer": {
+      "post": {
+        "summary": "Answer",
+        "description": "Répond à une question. Exige l'en-tête X-API-Key.",
+        "operationId": "answer_answer_post",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "",
+              "title": "X-Api-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Question"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Answer"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AjustementCurseurs": {
+        "properties": {
+          "chaleur": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 10.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chaleur"
+          },
+          "fraicheur": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 10.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fraicheur"
+          },
+          "floral": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 10.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Floral"
+          },
+          "boise": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 10.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Boise"
+          },
+          "intensite": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 10.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Intensite"
+          }
+        },
+        "type": "object",
+        "title": "AjustementCurseurs"
+      },
+      "Answer": {
+        "properties": {
+          "answer": {
+            "type": "string",
+            "title": "Answer"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model"
+          }
+        },
+        "type": "object",
+        "required": ["answer", "model"],
+        "title": "Answer"
+      },
+      "Curseurs": {
+        "properties": {
+          "chaleur": {
+            "type": "integer",
+            "maximum": 10.0,
+            "minimum": 0.0,
+            "title": "Chaleur",
+            "description": "Odeur chaude, gourmande, vanillée, ambrée, épicée (0 à 10).",
+            "examples": [5]
+          },
+          "fraicheur": {
+            "type": "integer",
+            "maximum": 10.0,
+            "minimum": 0.0,
+            "title": "Fraicheur",
+            "description": "Odeur fraîche : agrumes, vert, marin, menthe, propre (0 à 10).",
+            "examples": [5]
+          },
+          "floral": {
+            "type": "integer",
+            "maximum": 10.0,
+            "minimum": 0.0,
+            "title": "Floral",
+            "description": "Odeur de fleurs (0 à 10).",
+            "examples": [5]
+          },
+          "boise": {
+            "type": "integer",
+            "maximum": 10.0,
+            "minimum": 0.0,
+            "title": "Boise",
+            "description": "Bois, cèdre, santal, cuir, mousse (0 à 10).",
+            "examples": [5]
+          },
+          "intensite": {
+            "type": "integer",
+            "maximum": 10.0,
+            "minimum": 0.0,
+            "title": "Intensite",
+            "description": "Force de l'odeur : 0 = à peine perceptible, 10 = très puissante.",
+            "examples": [5]
+          }
+        },
+        "type": "object",
+        "required": ["chaleur", "fraicheur", "floral", "boise", "intensite"],
+        "title": "Curseurs"
+      },
+      "CurseursRequest": {
+        "properties": {
+          "chaleur": {
+            "type": "integer",
+            "maximum": 10.0,
+            "minimum": 0.0,
+            "title": "Chaleur",
+            "description": "Odeur chaude, gourmande, vanillée, ambrée, épicée (0 à 10).",
+            "examples": [5]
+          },
+          "fraicheur": {
+            "type": "integer",
+            "maximum": 10.0,
+            "minimum": 0.0,
+            "title": "Fraicheur",
+            "description": "Odeur fraîche : agrumes, vert, marin, menthe, propre (0 à 10).",
+            "examples": [5]
+          },
+          "floral": {
+            "type": "integer",
+            "maximum": 10.0,
+            "minimum": 0.0,
+            "title": "Floral",
+            "description": "Odeur de fleurs (0 à 10).",
+            "examples": [5]
+          },
+          "boise": {
+            "type": "integer",
+            "maximum": 10.0,
+            "minimum": 0.0,
+            "title": "Boise",
+            "description": "Bois, cèdre, santal, cuir, mousse (0 à 10).",
+            "examples": [5]
+          },
+          "intensite": {
+            "type": "integer",
+            "maximum": 10.0,
+            "minimum": 0.0,
+            "title": "Intensite",
+            "description": "Force de l'odeur : 0 = à peine perceptible, 10 = très puissante.",
+            "examples": [5]
+          },
+          "top_formules": {
+            "type": "integer",
+            "maximum": 13.0,
+            "minimum": 1.0,
+            "title": "Top Formules",
+            "description": "Nombre de formules renvoyées.",
+            "default": 3
+          },
+          "top_ingredients": {
+            "type": "integer",
+            "maximum": 20.0,
+            "minimum": 0.0,
+            "title": "Top Ingredients",
+            "description": "Nombre d'ingrédients Givaudan renvoyés.",
+            "default": 5
+          }
+        },
+        "type": "object",
+        "required": ["chaleur", "fraicheur", "floral", "boise", "intensite"],
+        "title": "CurseursRequest"
+      },
+      "FormuleReco": {
+        "properties": {
+          "rang": {
+            "type": "integer",
+            "title": "Rang",
+            "description": "1 = la plus proche."
+          },
+          "id_formule": {
+            "type": "integer",
+            "title": "Id Formule"
+          },
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "application": {
+            "type": "string",
+            "title": "Application",
+            "description": "Usage d'origine de la formule de démonstration."
+          },
+          "correspondance_pct": {
+            "type": "number",
+            "title": "Correspondance Pct",
+            "description": "100 = identique aux scores demandés, 0 = opposé sur tous les axes."
+          },
+          "profil": {
+            "$ref": "#/components/schemas/ProfilFormule",
+            "description": "Les 5 scores de la formule (0 à 10, une décimale)."
+          },
+          "famille_dominante": {
+            "type": "string",
+            "title": "Famille Dominante"
+          },
+          "familles_principales": {
+            "type": "string",
+            "title": "Familles Principales",
+            "description": "Part des 3 premières familles dans la formule."
+          },
+          "part_givaudan_pct": {
+            "type": "number",
+            "title": "Part Givaudan Pct",
+            "description": "Part de la formule (hors solvants) faite d'ingrédients Givaudan."
+          },
+          "ingredients_givaudan_principaux": {
+            "type": "string",
+            "title": "Ingredients Givaudan Principaux"
+          },
+          "alerte_catalogue": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Alerte Catalogue",
+            "description": "Ingrédients Givaudan de la formule absents du catalogue 2024."
+          },
+          "pourquoi": {
+            "type": "string",
+            "title": "Pourquoi",
+            "description": "Explication générée par le code (pas par le LLM)."
+          }
+        },
+        "type": "object",
+        "required": [
+          "rang",
+          "id_formule",
+          "nom",
+          "application",
+          "correspondance_pct",
+          "profil",
+          "famille_dominante",
+          "familles_principales",
+          "part_givaudan_pct",
+          "ingredients_givaudan_principaux",
+          "alerte_catalogue",
+          "pourquoi"
+        ],
+        "title": "FormuleReco"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "IngredientReco": {
+        "properties": {
+          "nom": {
+            "type": "string",
+            "title": "Nom"
+          },
+          "famille": {
+            "type": "string",
+            "title": "Famille"
+          },
+          "correspondance_pct": {
+            "type": "number",
+            "title": "Correspondance Pct"
+          },
+          "utilise_dans_une_formule_recommandee": {
+            "type": "boolean",
+            "title": "Utilise Dans Une Formule Recommandee"
+          },
+          "prix_indicatif_eur_kg": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prix Indicatif Eur Kg",
+            "description": "Prix revendeur au détail, 100 g pur, en EUR/kg. Indicatif."
+          }
+        },
+        "type": "object",
+        "required": [
+          "nom",
+          "famille",
+          "correspondance_pct",
+          "utilise_dans_une_formule_recommandee",
+          "prix_indicatif_eur_kg"
+        ],
+        "title": "IngredientReco"
+      },
+      "ProfilFormule": {
+        "properties": {
+          "chaleur": {
+            "type": "number",
+            "title": "Chaleur"
+          },
+          "fraicheur": {
+            "type": "number",
+            "title": "Fraicheur"
+          },
+          "floral": {
+            "type": "number",
+            "title": "Floral"
+          },
+          "boise": {
+            "type": "number",
+            "title": "Boise"
+          },
+          "intensite": {
+            "type": "number",
+            "title": "Intensite"
+          }
+        },
+        "type": "object",
+        "required": ["chaleur", "fraicheur", "floral", "boise", "intensite"],
+        "title": "ProfilFormule"
+      },
+      "Question": {
+        "properties": {
+          "question": {
+            "type": "string",
+            "title": "Question"
+          }
+        },
+        "type": "object",
+        "required": ["question"],
+        "title": "Question"
+      },
+      "RecoRequest": {
+        "properties": {
+          "description": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 3,
+            "title": "Description",
+            "description": "Description libre de l'ambiance voulue, écrite par la boutique.",
+            "examples": [
+              "Salon de coiffure de quartier, une odeur fraîche et propre, un peu florale, pas trop forte"
+            ]
+          },
+          "ajustements": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AjustementCurseurs"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Curseurs corrigés par la boutique après une première proposition : ils remplacent les scores lus par le LLM sur les axes donnés."
+          },
+          "top_formules": {
+            "type": "integer",
+            "maximum": 13.0,
+            "minimum": 1.0,
+            "title": "Top Formules",
+            "description": "Nombre de formules renvoyées.",
+            "default": 3
+          },
+          "top_ingredients": {
+            "type": "integer",
+            "maximum": 20.0,
+            "minimum": 0.0,
+            "title": "Top Ingredients",
+            "description": "Nombre d'ingrédients Givaudan renvoyés.",
+            "default": 5
+          }
+        },
+        "type": "object",
+        "required": ["description"],
+        "title": "RecoRequest"
+      },
+      "RecoResponse": {
+        "properties": {
+          "scores_utilises": {
+            "$ref": "#/components/schemas/Curseurs",
+            "description": "Scores après lecture du texte et ajustements."
+          },
+          "methode_lecture": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Methode Lecture",
+            "description": "« llm » ou « mots-clés » (secours si Ollama ne répond pas)."
+          },
+          "formules": {
+            "items": {
+              "$ref": "#/components/schemas/FormuleReco"
+            },
+            "type": "array",
+            "title": "Formules"
+          },
+          "ingredients": {
+            "items": {
+              "$ref": "#/components/schemas/IngredientReco"
+            },
+            "type": "array",
+            "title": "Ingredients"
+          },
+          "modele": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Modele",
+            "description": "Version du modèle et poids des axes appris."
+          },
+          "note_prix": {
+            "type": "string",
+            "title": "Note Prix"
+          }
+        },
+        "type": "object",
+        "required": [
+          "scores_utilises",
+          "formules",
+          "ingredients",
+          "modele",
+          "note_prix"
+        ],
+        "title": "RecoResponse"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": ["loc", "msg", "type"],
+        "title": "ValidationError"
+      }
+    }
+  }
+}
