@@ -68,40 +68,9 @@ Toutes les routes exigent l'en-tête `X-API-Key`.
 
 Exemple d'entrée et de sortie (abrégée) :
 
-```json
-{
-  "description": "Salon de coiffure de quartier, une odeur fraîche et propre, un peu florale, pas trop forte"
-}
-```
+![alt text]({AE95FC0B-1712-4A25-B15A-68592B9EE6DA}.png)
 
-```json
-{
-  "scores_utilises": {
-    "chaleur": 2,
-    "fraicheur": 9,
-    "floral": 4,
-    "boise": 1,
-    "intensite": 4
-  },
-  "methode_lecture": "llm",
-  "formules": [
-    {
-      "rang": 1,
-      "nom": "Shampoo HR1009 /2 (Givaudan)",
-      "correspondance_pct": 76.2,
-      "pourquoi": "Proche sur intensité (4 pour 4 demandé) et boisé (0 pour 1 demandé). Plus éloigné sur floral : la formule est plus marquée (9 pour 4)."
-    }
-  ],
-  "ingredients": [
-    {
-      "nom": "…",
-      "famille": "…",
-      "correspondance_pct": 0,
-      "prix_indicatif_eur_kg": null
-    }
-  ]
-}
-```
+![alt text]({42A78ED5-4984-445B-99DE-ABD25BB6F827}.png)
 
 ## 5. Endpoint dummy accessible à Tech via ngrok
 
