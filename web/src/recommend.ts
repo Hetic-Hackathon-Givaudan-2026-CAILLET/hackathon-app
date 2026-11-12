@@ -78,6 +78,15 @@ export function ensureDerived(): Derived {
 
 /* Recommandation : les 4 parfums les plus proches des curseurs */
 export function ranked() {
+  if (state.modelProducts) {
+    return state.modelProducts
+      .filter((m) => catalog.productsById[m.id])
+      .map((m, i) => ({
+        p: catalog.productsById[m.id],
+        sc: m.correspondance_pct / 100,
+        i,
+      }));
+  }
   const s = state.sliders.map((v) => v / 100);
   const extra = state.extra.toLowerCase();
   return catalog.products

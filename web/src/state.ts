@@ -1,5 +1,5 @@
 import { catalog } from './catalog';
-import type { Derived, Order, Shop, User } from './types';
+import type { Derived, ModelProduct, Order, Shop, User } from './types';
 
 export const state = {
   desc: '',
@@ -17,6 +17,8 @@ export const state = {
   prev: null as string | null,
   shop: {} as Shop,
   orders: [] as Order[],
+  // Produits choisis par le modèle ; null : calcul local (ranked)
+  modelProducts: null as ModelProduct[] | null,
 };
 
 // Nouvelle conversation : on repart du profil par défaut
@@ -25,6 +27,7 @@ export function resetSearch() {
   state.extra = '';
   state.reply = null;
   state.derived = null;
+  state.modelProducts = null;
   state.axes = catalog.defaultProfile.axes.slice();
   state.sliders = catalog.defaultProfile.vals.slice();
   state.confirm = null;

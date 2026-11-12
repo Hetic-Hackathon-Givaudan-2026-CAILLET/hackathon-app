@@ -3,6 +3,8 @@ import type {
   ChatAnalysis,
   Order,
   OrderItem,
+  Recommandation,
+  RecommandationCurseurs,
   Shop,
   User,
 } from './types';
@@ -65,6 +67,19 @@ export const api = {
   // `hint` : ce que l'analyse par mots-clés a déjà repéré, pour ancrer la réponse
   chat: (message: string, hint: { type: string | null; ambiance: string[] }) =>
     request<ChatAnalysis>('/api/chat', 'POST', { message, hint }),
+  recommander: (description: string) =>
+    request<Recommandation>('/api/recommandation', 'POST', { description }),
+  recommanderCurseurs: (body: {
+    description: string;
+    complement: string;
+    axes: number[];
+    curseurs: number[];
+  }) =>
+    request<RecommandationCurseurs>(
+      '/api/recommandation/curseurs',
+      'POST',
+      body,
+    ),
   orders: () => request<Order[]>('/api/orders'),
   createOrder: (items: OrderItem[]) =>
     request<Order>('/api/orders', 'POST', { items }),

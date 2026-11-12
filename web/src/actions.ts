@@ -56,9 +56,69 @@ async function askAssistant(text: string, kw: Derived) {
   }
 }
 
+// Chatbot : le modèle choisit les produits et conseille la position de chaque
+// curseur ; le site garde ses propres curseurs (profil du type de boutique).
+// Renvoie false si le modèle est indisponible : on garde l'analyse locale.
+async function findWithModel(text: string) {
+  busy(true);
+  try {
+    const r = await api.recommander(text);
+    const profile =
+      (r.type && catalog.profiles[r.type]) || catalog.defaultProfile;
+    state.desc = text;
+    state.extra = '';
+    applyDerived({
+      adjs: r.ambiance.map(
+        (tag) => catalog.lexicon.find((l) => l.tag === tag)?.adj ?? tag,
+      ),
+      tags: r.ambiance,
+      axes: profile.axes.slice(),
+      sliders: profile.axes.map((a) => r.curseurs[a]),
+      type: r.type,
+    });
+    state.modelProducts = r.produits;
+    state.reply = r.question_relance
+      ? `${r.reponse} ${r.question_relance}`
+      : r.reponse;
+    go('selection');
+    return true;
+  } catch (e) {
+    console.warn('Modèle indisponible :', e);
+    return false;
+  } finally {
+    busy(false);
+  }
+}
+
+// Curseurs : le modèle reclasse les produits selon le réglage du client.
+// Seule la dernière demande compte ; en cas d'échec, le calcul local reste affiché.
+let slidersRequest = 0;
+let slidersTimer: ReturnType<typeof setTimeout>;
+function askModelForSliders(delay = 250) {
+  clearTimeout(slidersTimer);
+  slidersTimer = setTimeout(async () => {
+    const id = ++slidersRequest;
+    try {
+      const r = await api.recommanderCurseurs({
+        description: state.desc,
+        complement: state.extra,
+        axes: state.axes,
+        curseurs: state.sliders,
+      });
+      if (id !== slidersRequest) return;
+      state.modelProducts = r.produits;
+      const grid = document.getElementById('grid');
+      if (grid) grid.innerHTML = gridHTML();
+    } catch (e) {
+      console.warn('Modèle indisponible :', e);
+    }
+  }, delay);
+}
+
 async function find() {
   const field = document.getElementById('desc') as HTMLTextAreaElement | null;
   const text = field?.value.trim() || exampleText();
+  if (await findWithModel(text)) return;
   const kw = derive(text);
   const ai = await askAssistant(text, kw);
   state.desc = text;
@@ -91,6 +151,7 @@ const actions: Record<string, Action> = {
   ex: (t) => {
     const x = catalog.examples[+t.dataset.i!];
     state.desc = x.text;
+    state.modelProducts = null;
     applyDerived(derive(x.text));
     state.extra = '';
     state.reply = null;
@@ -117,7 +178,9 @@ const actions: Record<string, Action> = {
       ? (consistentReply(ai.reply, d.tags) ??
         (d.tags.length ? 'C’est noté, j’ajuste l’ambiance.' : null))
       : null;
+    state.modelProducts = null;
     render();
+    askModelForSliders(0);
   },
   add: (t) => {
     const id = t.dataset.id!;
@@ -354,7 +417,9 @@ export function bindEvents() {
     if (t.dataset?.slider !== undefined) {
       state.sliders[+t.dataset.slider] = +t.value;
       t.style.setProperty('--v', t.value + '%');
+      state.modelProducts = null;
       $('#grid').innerHTML = gridHTML();
+      askModelForSliders();
     } else if (t.id === 'p-num') {
       t.value = t.value
         .replace(/\D/g, '')

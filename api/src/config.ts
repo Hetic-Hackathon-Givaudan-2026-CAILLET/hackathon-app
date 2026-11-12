@@ -11,5 +11,8 @@ export const {
   AI_BASE_URL,
   AI_MODEL,
   AI_API_KEY = '',
+  // Service IA de l'équipe Data/IA (ai/, modèle de recommandation)
+  MODEL_API_URL = 'http://localhost:8000',
+  MODEL_API_KEY = '',
 } = process.env;
 export const PORT = Number(process.env.PORT ?? 3000);

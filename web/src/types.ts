@@ -72,6 +72,26 @@ export type User = {
   tel: string | null;
 };
 
+// Réponses du modèle de recommandation (équipe Data/IA)
+export type ModelProduct = {
+  id: string;
+  nom: string;
+  correspondance_pct: number;
+};
+export type Recommandation = {
+  type: string | null;
+  reponse: string;
+  ambiance: string[];
+  // Position conseillée sur chaque axe du site : curseurs[idAxe], de 0 à 100
+  curseurs: number[];
+  produits: ModelProduct[];
+  question_relance: string | null;
+};
+export type RecommandationCurseurs = {
+  reponse: string;
+  produits: ModelProduct[];
+};
+
 // Réponse de POST /api/chat : le type de boutique repéré et une courte réponse
 export type ChatAnalysis = { reply: string | null; type: string | null };
 
