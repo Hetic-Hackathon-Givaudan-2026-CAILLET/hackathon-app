@@ -7,7 +7,7 @@ import {
   exampleText,
   templateReply,
 } from './recommend';
-import { loadReco, moveRecoSlider } from './givaudan';
+import { flipCard, loadReco, moveRecoSlider } from './givaudan';
 import { go, render, setErr, toast } from './render';
 import { SHOP } from './shopForm';
 import { recoDescription, resetSearch, state } from './state';
@@ -338,6 +338,7 @@ const actions: Record<string, Action> = {
   },
   reload: () => location.reload(),
   'reco-retry': () => loadReco(recoDescription()),
+  flip: (t) => flipCard(t.closest<HTMLElement>('.flipcard')!),
 };
 
 export function bindEvents() {

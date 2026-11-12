@@ -1338,3 +1338,120 @@ body[data-view='accueil'] .main {
     grid-column: 1 / -1;
   }
 }
+
+/* Cartes de formules retournables : photo et correspondance devant, détails derrière */
+.flipcard {
+  display: grid;
+  perspective: 1200px;
+}
+.flipcard .face {
+  grid-area: 1 / 1;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transition:
+    transform 0.5s ease,
+    opacity 0s linear 0.25s;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+}
+.flipcard .face-front {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  cursor: pointer;
+}
+.flipcard .face-back {
+  transform: rotateY(180deg);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.flipcard .face-back p {
+  margin: 0;
+}
+.flipcard.is-flipped .face-front {
+  transform: rotateY(-180deg);
+}
+.flipcard.is-flipped .face-back {
+  transform: rotateY(0);
+}
+.flip-photo {
+  position: relative;
+  display: block;
+  height: 180px;
+  background: var(--photo);
+}
+.flip-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.flip-rang {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--action);
+  color: var(--on-action);
+  font-size: 13px;
+  font-weight: 500;
+}
+.flip-pct {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 0 0 1px var(--line);
+}
+.flip-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+  flex: 1;
+}
+.flip-name {
+  font-size: 20px;
+  font-weight: 500;
+}
+.flip-more {
+  margin-top: auto;
+  padding-top: 8px;
+  font-size: 13px;
+  color: var(--text2);
+}
+.flipcard .face-front:hover .flip-more,
+.flipcard .face-front:focus-visible .flip-more {
+  color: var(--text);
+  text-decoration: underline;
+}
+.flip-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+}
+.flip-actions .btn {
+  flex: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .flipcard .face {
+    transition: none;
+  }
+}
