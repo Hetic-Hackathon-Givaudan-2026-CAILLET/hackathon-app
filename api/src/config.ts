@@ -11,5 +11,7 @@ export const {
   AI_BASE_URL,
   AI_MODEL,
   AI_API_KEY = '',
+  // Service Python du modèle de recommandation (api.py)
+  RECO_API_URL = 'http://localhost:8000',
 } = process.env;
 export const PORT = Number(process.env.PORT ?? 3000);

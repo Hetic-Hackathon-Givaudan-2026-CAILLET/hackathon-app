@@ -1,5 +1,5 @@
 import { catalog } from './catalog';
-import type { Derived, Order, Shop, User } from './types';
+import type { Derived, Order, Reco, Shop, User } from './types';
 
 export const state = {
   desc: '',
@@ -17,6 +17,13 @@ export const state = {
   prev: null as string | null,
   shop: {} as Shop,
   orders: [] as Order[],
+  // Recommandation du modèle Givaudan pour la demande `key` (desc + extra)
+  reco: {
+    key: '',
+    status: 'idle' as 'idle' | 'loading' | 'ready' | 'error',
+    data: null as Reco | null,
+    error: '',
+  },
 };
 
 // Nouvelle conversation : on repart du profil par défaut
