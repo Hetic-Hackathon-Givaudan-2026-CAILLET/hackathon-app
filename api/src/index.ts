@@ -1,17 +1,15 @@
 import express from 'express';
-import pg from 'pg';
+import { complete } from './ai.js';
+import { PORT } from './config.js';
+import { customer } from './customer.js';
+import { db } from './db.js';
+import { errorHandler } from './http.js';
+import { catalog } from './routes/catalog.js';
+import { chat } from './routes/chat.js';
+import { me } from './routes/me.js';
+import { orders } from './routes/orders.js';
+import { shop } from './routes/shop.js';
 
-// En dev, la configuration vient de api/.env ; en production, de l'hébergeur
-try {
-  process.loadEnvFile();
-} catch {
-  // Pas de .env : on garde l'environnement tel quel
-}
-
-const { DATABASE_URL, AI_BASE_URL, AI_MODEL, AI_API_KEY = '' } = process.env;
-const PORT = Number(process.env.PORT ?? 3000);
-
-const db = new pg.Pool({ connectionString: DATABASE_URL });
 const app = express();
 app.use(express.json());
 
@@ -41,25 +39,16 @@ app.post('/api/questions', async (req, res) => {
   res.status(201).json(rows[0]);
 });
 
+// Catalogue : public. Le reste est rattaché au visiteur (en-tête X-Customer-Id)
+app.use('/api', catalog, chat);
+app.use('/api', customer, me, shop, orders);
+
 // Même appel pour Ollama, Mistral, OpenAI… : seule la configuration change
-async function ask(question: string): Promise<string> {
-  const response = await fetch(`${AI_BASE_URL}/chat/completions`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${AI_API_KEY}`,
-    },
-    body: JSON.stringify({
-      model: AI_MODEL,
-      messages: [{ role: 'user', content: question }],
-    }),
-  });
-  if (!response.ok) {
-    throw new Error(`IA : ${response.status} ${await response.text()}`);
-  }
-  const data = await response.json();
-  return data.choices[0].message.content;
-}
+const ask = (question: string) =>
+  complete([{ role: 'user', content: question }]);
+
+// Doit rester après les routes
+app.use(errorHandler);
 
 // Sans adresse, Node écoute sur toutes les interfaces : joignable hors du conteneur
 app.listen(PORT, () => console.log(`API sur http://localhost:${PORT}`));
