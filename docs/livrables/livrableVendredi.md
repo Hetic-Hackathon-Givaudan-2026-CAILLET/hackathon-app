@@ -8,14 +8,14 @@
 
 ## 1. Code et documentation finalisés
 
-| Élément                  | Où                                                                                                                                                                                  |
-| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Pipeline Data (Python)   | [`ai/reco/`](../../ai/reco/) : nettoyage, profils, lecture, moteur, entraînement, évaluation, export                                                                                |
-| Service de démonstration | [`ai/main.py`](../../ai/main.py) (FastAPI, Swagger sur `http://localhost:8000/docs`)                                                                                                |
-| Modèle publié            | [`ai/models/modele_reco.json`](../../ai/models/modele_reco.json), version `1.0.0-2026-11-12`                                                                                        |
-| Intégration dans le site | [`api/src/reco.ts`](../../api/src/reco.ts) et [`api/src/routes/recommandation.ts`](../../api/src/routes/recommandation.ts), données dans `db/init/005-006`                          |
-| Tests automatisés        | [`ai/tests/test_reco.py`](../../ai/tests/test_reco.py) : 17 tests, sans modèle de langage                                                                                           |
-| Documentation            | [`ai/README.md`](../../ai/README.md), [ADR 0007](../adr/0007-recommandation-givaudan.md), livrables [lundi](livrableLundi.md), [mardi](livrableMardi.md), [jeudi](livrableJeudi.md) |
+| Élément                  | Où                                                                                                                                                         |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Pipeline Data (Python)   | [`ai/reco/`](../../ai/reco/) : nettoyage, profils, lecture, moteur, entraînement, évaluation, export                                                       |
+| Service de démonstration | [`ai/main.py`](../../ai/main.py) (FastAPI, Swagger sur `http://localhost:8000/docs`)                                                                       |
+| Modèle publié            | [`ai/models/modele_reco.json`](../../ai/models/modele_reco.json), version `1.0.0-2026-11-12`                                                               |
+| Intégration dans le site | [`api/src/reco.ts`](../../api/src/reco.ts) et [`api/src/routes/recommandation.ts`](../../api/src/routes/recommandation.ts), données dans `db/init/005-006` |
+| Tests automatisés        | [`ai/tests/test_reco.py`](../../ai/tests/test_reco.py) : 17 tests, sans modèle de langage                                                                  |
+| Documentation            | [`ai/README.md`](../../ai/README.md), livrables [lundi](livrableLundi.md), [mardi](livrableMardi.md), [jeudi](livrableJeudi.md)                            |
 
 ## 2. Procédure de reproduction des résultats
 
@@ -89,22 +89,11 @@ Dans le site, page de sélection, section **« Souhaitez-vous ajuster votre requ
 | Curseur déplacé : formules recalculées aussitôt        | Même moteur, sans modèle de langage                          |
 | Ajout au panier et commande                            | Les 13 formules exportées comme produits du site             |
 
+**Capture du prototype** pour la demande « parfum sportif » : l'IA règle les
+curseurs (fraîcheur 8, intensité 7, chaleur 1, floral 1, boisé 2) et le moteur
+propose AP Roll-on UR1007 (76 %), Mango peach (73 %) et Feminine FG1006 (69 %).
+
+![Section « Souhaitez-vous ajuster votre requête ? » : 5 curseurs réglés par l'IA pour « parfum sportif » et les 3 formules Givaudan recommandées](vendredi-demo.png)
+
 **Scénario de démonstration conseillé** : « Barbier pour hommes, une odeur boisée et cuir, assez présente ».
 Résultat attendu : Masculine MM1006 en 1ʳᵉ position (82 %), puis un curseur déplacé en direct.
-
----
-
-## Raconter la valeur de la donnée (capsule 9h30)
-
-- **Sources** : 3 sources publiques (formules, anciens catalogues, prix de revendeurs), sans données internes Givaudan.
-- **Visualisations** : chaîne des données (sources → nettoyage → profils → modèle → site), profil d'une formule sur 5 axes, comparaison V1 / V2 ci-dessus.
-- **Valeur** : une boutique décrit une ambiance avec ses mots ; la donnée nettoyée permet de lui proposer en quelques secondes les fragrances Givaudan les plus proches.
-- **Limites** : section 4, à dire franchement au jury.
-
-## Validation
-
-**Solution reproductible** : 5 commandes, découpage et température fixés, résultats de référence versionnés, 17 tests.
-
-**Résultats présentables au jury** : V2 mesurée (hit@3 64 % contre 57 %), limites et biais identifiés, résultats visibles dans le site.
-
-> **À compléter** : dépôt du dossier de pitch à 13h30 (lien OneDrive).
